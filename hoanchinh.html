@@ -575,25 +575,51 @@
             document.getElementById('coupleStanding').style.opacity = '0'; document.getElementById('coupleKissing').style.opacity = '0';
             document.getElementById('passTextContainer').classList.remove('hidden');
         }
-        function checkPasscode() {
-            if (currentInput === correctPasscode) {
-                document.getElementById('passTextContainer').classList.add('hidden');
-                document.getElementById('coupleStanding').style.opacity = '0';
-                const kiss = document.getElementById('coupleKissing'); kiss.style.opacity = '1'; kiss.style.transform = 'scale(1.3)';
-                const colors = ['#ff4d6d', '#ffb3c1', '#ffffff', '#ffd700'];
-                for (let i = 0; i < 50; i++) {
-                    const c = document.createElement('div'); c.classList.add('confetti');
-                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    c.style.setProperty('--tx', (Math.random()-0.5)*400+'px'); c.style.setProperty('--ty', (Math.random()-1)*400+'px');
-                    c.style.animation = `confetti-shoot ${1+Math.random()}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
-                    document.getElementById('passcodeScreen').appendChild(c); setTimeout(()=>c.remove(), 2000);
-                }
-                setTimeout(() => { document.getElementById('passcodeScreen').classList.remove('active'); startChat(); }, 2500);
-            } else {
-                const d = document.getElementById('dotsContainer'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
-                setTimeout(() => { clearPasscode(); }, 500);
-            }
+      /* --- PHẦN LOGIC ĐÃ SỬA: PHÁT NHẠC KHI NHẬP ĐÚNG PASS --- */
+
+function checkPasscode() {
+    if (currentInput === correctPasscode) {
+        // 1. Phát nhạc ngay khi đúng mật mã
+        const audio = document.getElementById("loveSong");
+        audio.volume = 1.0;
+        audio.play().catch(e => console.log("Yêu cầu tương tác người dùng để phát nhạc"));
+
+        // 2. Các hiệu ứng hình ảnh
+        document.getElementById('passTextContainer').classList.add('hidden');
+        document.getElementById('coupleStanding').style.opacity = '0';
+        
+        const kiss = document.getElementById('coupleKissing');
+        kiss.style.opacity = '1';
+        kiss.style.transform = 'scale(1.3)';
+
+        // Pháo hoa giấy (confetti)
+        const colors = ['#ff4d6d', '#ffb3c1', '#ffffff', '#ffd700'];
+        for (let i = 0; i < 50; i++) {
+            const c = document.createElement('div');
+            c.classList.add('confetti');
+            c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            c.style.setProperty('--tx', (Math.random() - 0.5) * 400 + 'px');
+            c.style.setProperty('--ty', (Math.random() - 1) * 400 + 'px');
+            c.style.animation = `confetti-shoot ${1 + Math.random()}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
+            document.getElementById('passcodeScreen').appendChild(c);
+            setTimeout(() => c.remove(), 2000);
         }
+
+        // Chuyển vào màn hình chat sau 2.5s
+        setTimeout(() => {
+            document.getElementById('passcodeScreen').classList.remove('active');
+            startChat();
+        }, 2500);
+
+    } else {
+        // Sai mật mã: Rung các dấu chấm
+        const d = document.getElementById('dotsContainer');
+        d.classList.remove('shake');
+        void d.offsetWidth; 
+        d.classList.add('shake');
+        setTimeout(() => { clearPasscode(); }, 500);
+    }
+}
         function updateCoupleState() {
             const len = currentInput.length, g = document.getElementById('charGirl'), b = document.getElementById('charBoy');
             if (len < 3) {
@@ -635,24 +661,24 @@
             giftBox.addEventListener('touchstart', startHold, {passive: false}); giftBox.addEventListener('touchend', endHold); giftBox.addEventListener('touchcancel', endHold);
         }
 
-        function triggerPhase2Transition() {
-            const audio = document.getElementById("loveSong"); audio.volume = 1.0; audio.play().catch(e => console.log("Lỗi play nhạc"));
-            const phone = document.getElementById('phoneContainer');
-            phone.classList.add('fade-out'); // Kích hoạt CSS mờ dần
-            document.body.classList.add('mode-3d'); // Đổi nền body sang đen
+       /* --- ĐIỀU CHỈNH HÀM CHUYỂN CẢNH (BỎ PHẦN PHÁT NHẠC TRÙNG LẶP) --- */
+function triggerPhase2Transition() {
+    // Không cần audio.play() ở đây nữa vì đã phát ở bước Passcode
+    const phone = document.getElementById('phoneContainer');
+    phone.classList.add('fade-out');
+    document.body.classList.add('mode-3d');
 
-            // QUAN TRỌNG: Đợi 1.5s cho hiệu ứng mờ xong rồi mới ẩn hẳn (display: none)
-            setTimeout(() => {
-                phone.style.display = 'none'; 
-            }, 1500);
+    setTimeout(() => {
+        phone.style.display = 'none'; 
+    }, 1500);
 
-            const lovePhase = document.getElementById('love-phase');
-            lovePhase.style.display = 'block';
-            setTimeout(() => {
-                lovePhase.classList.add('active-phase');
-                startParticleSystem(); 
-            }, 100);
-        }
+    const lovePhase = document.getElementById('love-phase');
+    lovePhase.style.display = 'block';
+    setTimeout(() => {
+        lovePhase.classList.add('active-phase');
+        startParticleSystem(); 
+    }, 100);
+}
 
         // LOGIC 3D
         const START_DATE = "2025-08-17"; 
