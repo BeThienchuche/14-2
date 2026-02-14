@@ -12,26 +12,9 @@
     
     <style>
         /* =========================================
-           CSS CHUNG & TỐI ƯU MOBILE
+           CSS CHUNG
            ========================================= */
-        * { 
-            box-sizing: border-box; margin: 0; padding: 0; 
-            user-select: none; -webkit-user-select: none; /* Ngăn bôi đen */
-            -webkit-tap-highlight-color: transparent; /* Ngăn highlight khi chạm */
-        }
-
-        /* Ngăn hiện menu lưu ảnh/copy trên điện thoại */
-        img {
-            -webkit-touch-callout: none;
-            -webkit-user-drag: none;
-            user-drag: none;
-            pointer-events: none; /* Ảnh chỉ để ngắm, không tương tác (trừ ảnh gallery sẽ xử lý riêng) */
-        }
-
-        /* Cho phép tương tác với các ảnh cần click như Avatar, nút bấm */
-        .action-btn img, .app-icon img, .avatar, .gift-img, #spin-container img, .corner-img-tl, .corner-img-br, .letter-img-3d {
-            pointer-events: auto;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         body {
             background: radial-gradient(circle at center, #5d1a23 0%, #000000 100%);
@@ -42,6 +25,7 @@
             perspective: 1200px; 
         }
 
+        /* Khi sang chế độ 3D thì nền đen hoàn toàn */
         body.mode-3d { background: #000; }
 
         /* =========================================
@@ -57,6 +41,7 @@
             transform: translateZ(0);
         }
         
+        /* Hiệu ứng biến mất của điện thoại */
         .phone-container.fade-out {
             opacity: 0;
             transform: scale(2); 
@@ -85,6 +70,7 @@
             z-index: 1; pointer-events: none;
         }
 
+        /* Dynamic Island */
         .dynamic-island-container {
             position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
             z-index: 999; width: 126px; height: 37px; pointer-events: none;
@@ -109,6 +95,7 @@
             z-index: 999;
         }
 
+        /* Lock Screen Content */
         .screen-content {
             position: relative; z-index: 10; height: 100%;
             display: flex; flex-direction: column; align-items: center; padding-top: 80px;
@@ -163,6 +150,7 @@
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
+        /* Couple Animation on Phone */
         .couple-container-phone { position: absolute; top: 50px; width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; z-index: 60; pointer-events: none; }
         .char-img { position: absolute; width: 110px; height: auto; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
         .char-girl { left: 30px; } .char-boy { right: 30px; }
@@ -217,7 +205,7 @@
         .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* Hộp quà - CHẠM LÀ MỞ */
+        /* Hộp quà & Hiệu ứng giữ */
         .gift-container { 
             align-self: center; margin-top: 100px; display: flex; flex-direction: column; align-items: center; 
             cursor: pointer; opacity: 0; transform: translateY(20px); transition: 0.5s; 
@@ -231,6 +219,20 @@
             animation: swing 1.5s ease-in-out infinite alternate; 
         }
         @keyframes swing { from { transform: rotate(8deg); } to { transform: rotate(-8deg); } }
+
+        .gift-container.holding .gift-img {
+            animation: intense-shake 0.1s infinite !important;
+            filter: drop-shadow(0 0 50px #fff) brightness(1.3);
+            transform: scale(1.1);
+        }
+        @keyframes intense-shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
 
         .chat-footer {
             padding: 10px 15px 30px; display: flex; align-items: center; gap: 15px; z-index: 10;
@@ -274,6 +276,7 @@
             transform: scale(0.9);
         }
         
+        /* Đổi tên class này để không trùng với phone */
         .couple-container-3d {
             display: flex; align-items: center; justify-content: center; gap: 40px;
             width: 90%; max-width: 800px;
@@ -283,16 +286,19 @@
         .days { font-size: 80px; color: #fff; text-shadow: 0 0 30px rgba(255, 77, 109, 1); font-weight: 700; line-height: 1; margin-bottom: 10px; }
         .days-label { font-family: 'Dancing Script'; font-size: 32px; color: #ffb7c5; text-shadow: 0 0 10px #ff4d6d; white-space: nowrap; }
         
+        /* Hiệu ứng trượt vào */
         .person { display: flex; flex-direction: column; align-items: center; transition: transform 1s ease-out; }
         .p-left { transform: translateX(-50px); opacity: 0; transition: all 1.5s ease; }
         .p-right { transform: translateX(50px); opacity: 0; transition: all 1.5s ease; }
         
+        /* Class kích hoạt hiện 3D UI */
         .show-ui .p-left, .show-ui .p-right { transform: translateX(0); opacity: 1; }
         .show-ui { opacity: 1 !important; transform: scale(1) !important; }
         .explode-ui { opacity: 0 !important; transform: scale(1.5) !important; filter: blur(20px); pointer-events: none; }
 
         .avatar-3d { width: 130px; height: 130px; border-radius: 50%; border: 4px solid #ff4d6d; object-fit: cover; box-shadow: 0 0 40px rgba(255, 77, 109, 0.6); background: #fff; margin-bottom: 15px; }
-        .name-3d { color: #fff; font-family: 'Dancing Script'; font-size: 28px; text-shadow: 0 0 10px #ff4d6d; white-space: nowrap; }
+        .name-3d { color: #fff; font-family: 'Dancing Script'; font-size: 28px; text-shadow: 0 0 10px #ff4d6d; white-space: nowrap;
+}
 
         /* Gallery */
         #gallery-container { position: absolute; width: 100%; height: 100%; z-index: 10; pointer-events: none; opacity: 0; transition: opacity 1s ease; display: flex; justify-content: center; align-items: center; }
@@ -328,7 +334,7 @@
         .card-signature { font-family: 'Dancing Script', cursive; font-size: 1.4em; color: #d6336c; text-align: right; opacity: 0; transition: 1s; }
         .close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #d6336c; font-size: 1.8em; cursor: pointer; z-index: 40; }
         .corner-img-tl, .corner-img-br { position: absolute; width: 100px; height: 100px; object-fit: cover; border-radius: 50%; z-index: 35; }
-        .corner-img-tl { top: 2px; left: 2px; } .corner-img-br { bottom: 2px; right: 2px; }
+        .corner-img-tl { top: -5px; left: -5px; } .corner-img-br { bottom: -10px; right: -5px; }
         .heart-fall { position: fixed; top: -10vh; color: #ff4d6d; animation: fall linear forwards; z-index: 500; }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
 
@@ -431,11 +437,10 @@
                     <div class="typing-indicator" id="typing">
                         <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
                     </div>
-                    
-                    <div class="gift-container" id="giftBox" onclick="openGift()">
+                    <div class="gift-container" id="giftBox">
                         <img src="qua.png" class="gift-img" alt="Hộp quà">
                         <div style="font-size: 13px; color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.8); margin-top: 10px;">
-                            Chạm nhẹ để mở quà! ❤️
+                            Ấn giữ 2s để mở quà! ❤️
                         </div>
                     </div>
                     <div style="height: 10px;"></div>
@@ -614,25 +619,29 @@
                 chatArea.insertBefore(b, typing); chatArea.scrollTop = chatArea.scrollHeight;
                 await new Promise(r => setTimeout(r, 1200));
             }
-            setTimeout(() => { giftBox.classList.add('show'); chatArea.scrollTop = chatArea.scrollHeight; }, 500);
+            setTimeout(() => { giftBox.classList.add('show'); chatArea.scrollTop = chatArea.scrollHeight; setupGiftBoxHold(); }, 500);
         }
 
-        // --- HÀM MỞ QUÀ MỚI: CHẠM LÀ MỞ ---
-        function openGift() {
-            const audio = document.getElementById("loveSong");
-            audio.volume = 1.0;
-            // Phát nhạc ngay lập tức khi người dùng click/touch
-            audio.play().catch(e => console.log("Lỗi play nhạc: " + e));
-            
-            triggerPhase2Transition();
+        // LOGIC CHUYỂN CẢNH (HOLD 2S)
+        function setupGiftBoxHold() {
+            const giftBox = document.getElementById('giftBox');
+            let holdTimer = null, isHolding = false;
+            const startHold = (e) => {
+                e.preventDefault(); if (isHolding) return; isHolding = true; giftBox.classList.add('holding');
+                holdTimer = setTimeout(() => { giftBox.classList.remove('holding'); triggerPhase2Transition(); }, 2000);
+            };
+            const endHold = () => { if (!isHolding) return; isHolding = false; giftBox.classList.remove('holding'); if (holdTimer) clearTimeout(holdTimer); };
+            giftBox.addEventListener('mousedown', startHold); giftBox.addEventListener('mouseup', endHold); giftBox.addEventListener('mouseleave', endHold);
+            giftBox.addEventListener('touchstart', startHold, {passive: false}); giftBox.addEventListener('touchend', endHold); giftBox.addEventListener('touchcancel', endHold);
         }
 
         function triggerPhase2Transition() {
+            const audio = document.getElementById("loveSong"); audio.volume = 1.0; audio.play().catch(e => console.log("Lỗi play nhạc"));
             const phone = document.getElementById('phoneContainer');
             phone.classList.add('fade-out'); // Kích hoạt CSS mờ dần
             document.body.classList.add('mode-3d'); // Đổi nền body sang đen
 
-            // Đợi 1.5s cho hiệu ứng mờ xong rồi mới ẩn hẳn (display: none)
+            // QUAN TRỌNG: Đợi 1.5s cho hiệu ứng mờ xong rồi mới ẩn hẳn (display: none)
             setTimeout(() => {
                 phone.style.display = 'none'; 
             }, 1500);
