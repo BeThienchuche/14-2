@@ -28,6 +28,24 @@
         /* Khi sang chế độ 3D thì nền đen hoàn toàn */
         body.mode-3d { background: #000; }
 
+        img {
+    /* Ngăn hiện menu khi ấn giữ lâu trên iOS (Lưu ảnh, sao chép...) */
+    -webkit-touch-callout: none; 
+    
+    /* Ngăn không cho kéo ảnh đi */
+    -webkit-user-drag: none; 
+    user-drag: none;
+    
+    /* Ngăn bôi đen/chọn ảnh */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Ngăn hiện màu nền (highlight) khi chạm vào bất cứ cái gì */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
         /* =========================================
            PHẦN 1: GIAO DIỆN ĐIỆN THOẠI
            ========================================= */
@@ -622,18 +640,58 @@
             setTimeout(() => { giftBox.classList.add('show'); chatArea.scrollTop = chatArea.scrollHeight; setupGiftBoxHold(); }, 500);
         }
 
-        // LOGIC CHUYỂN CẢNH (HOLD 2S)
-        function setupGiftBoxHold() {
-            const giftBox = document.getElementById('giftBox');
-            let holdTimer = null, isHolding = false;
-            const startHold = (e) => {
-                e.preventDefault(); if (isHolding) return; isHolding = true; giftBox.classList.add('holding');
-                holdTimer = setTimeout(() => { giftBox.classList.remove('holding'); triggerPhase2Transition(); }, 2000);
-            };
-            const endHold = () => { if (!isHolding) return; isHolding = false; giftBox.classList.remove('holding'); if (holdTimer) clearTimeout(holdTimer); };
-            giftBox.addEventListener('mousedown', startHold); giftBox.addEventListener('mouseup', endHold); giftBox.addEventListener('mouseleave', endHold);
-            giftBox.addEventListener('touchstart', startHold, {passive: false}); giftBox.addEventListener('touchend', endHold); giftBox.addEventListener('touchcancel', endHold);
+        // Thay thế toàn bộ hàm setupGiftBoxHold cũ bằng hàm này
+function setupGiftBoxHold() {
+    const giftBox = document.getElementById('giftBox');
+    const audio = document.getElementById("loveSong"); // Lấy thẻ audio
+    let holdTimer = null;
+    let isHolding = false;
+
+    const startHold = (e) => {
+        e.preventDefault(); 
+        if (isHolding) return;
+        isHolding = true;
+        giftBox.classList.add('holding');
+
+        // --- FIX CHO MOBILE: PHÁT NHẠC NGAY (NHƯNG IM LẶNG) ---
+        audio.muted = true; // Tắt tiếng trước
+        audio.play().catch(err => console.log("Chưa tương tác xong")); // Phát ngay để lấy quyền
+
+        // BẮT ĐẦU ĐẾM 2 GIÂY
+        holdTimer = setTimeout(() => {
+            giftBox.classList.remove('holding');
+            
+            // --- KHI ĐỦ 2S: BẬT TIẾNG LÊN ---
+            audio.muted = false; 
+            audio.volume = 1.0; 
+            
+            triggerPhase2Transition(); // Chuyển cảnh
+        }, 2000);
+    };
+
+    const endHold = (e) => {
+        if (!isHolding) return;
+        isHolding = false;
+        giftBox.classList.remove('holding');
+        
+        // Nếu thả tay sớm quá thì dừng nhạc và tua lại đầu
+        if (holdTimer) {
+            clearTimeout(holdTimer);
+            audio.pause();
+            audio.currentTime = 0;
         }
+    };
+
+    // Gán sự kiện
+    giftBox.addEventListener('mousedown', startHold);
+    giftBox.addEventListener('mouseup', endHold);
+    giftBox.addEventListener('mouseleave', endHold);
+    
+    // Quan trọng cho điện thoại:
+    giftBox.addEventListener('touchstart', startHold, {passive: false});
+    giftBox.addEventListener('touchend', endHold);
+    giftBox.addEventListener('touchcancel', endHold);
+}
 
         function triggerPhase2Transition() {
             const audio = document.getElementById("loveSong"); audio.volume = 1.0; audio.play().catch(e => console.log("Lỗi play nhạc"));
