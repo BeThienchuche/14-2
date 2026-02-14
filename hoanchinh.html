@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Valentine 14/02</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500;600;700;800&family=Great+Vibes&family=Cinzel:wght@700&family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           CSS CHUNG
+           ========================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: radial-gradient(circle at center, #5d1a23 0%, #000000 100%);
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw; overflow: hidden;
+            font-family: 'Open Sans', sans-serif;
+            transition: background 1.5s ease; 
+            perspective: 1200px; 
+        }
+
+        /* Khi sang chế độ 3D thì nền đen hoàn toàn */
+        body.mode-3d { background: #000; }
+
+        /* =========================================
+           PHẦN 1: GIAO DIỆN ĐIỆN THOẠI
+           ========================================= */
+        .phone-container {
+            position: relative; width: 435px; height: 880px;
+            flex-shrink: 0; transform-origin: center center;
+            opacity: 1; 
+            transition: opacity 1.5s ease, transform 1.5s ease, filter 1.5s ease;
+            -webkit-box-reflect: below 0px linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.2));
+            z-index: 100; 
+            transform: translateZ(0);
+        }
+        
+        /* Hiệu ứng biến mất của điện thoại */
+        .phone-container.fade-out {
+            opacity: 0;
+            transform: scale(2); 
+            filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .iphone-frame {
+            position: relative; width: 100%; height: 100%;
+            background-color: #000; border-radius: 55px;
+            box-shadow: 0 0 0 2px #3a3a3a, 0 0 0 8px #1a1a1a, 0 0 0 10px #000, 0 30px 60px rgba(0,0,0,0.6);
+            overflow: hidden; color: white;
+            transform: translate3d(0,0,0);
+        }
+
+        .wallpaper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?q=80&w=2532&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            z-index: 0; transform: scale(1.05);
+        }
+
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%, rgba(0,0,0,0.4) 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        /* Dynamic Island */
+        .dynamic-island-container {
+            position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+            z-index: 999; width: 126px; height: 37px; pointer-events: none;
+        }
+        .dynamic-island {
+            width: 100%; height: 100%; background-color: black;
+            border-radius: 50px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 10px; box-shadow: inset 0 0 2px rgba(255,255,255,0.1);
+        }
+        .di-camera {
+            width: 18px; height: 18px; margin-left: 8px; position: relative;
+            background: #0f0f0f; border-radius: 50%; box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+        }
+        .di-camera::after {
+            content: ''; position: absolute; top: 40%; left: 40%; width: 4px; height: 4px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
+        }
+
+        .home-indicator { 
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); 
+            width: 130px; height: 5px; background-color: white; border-radius: 10px; 
+            z-index: 999;
+        }
+
+        /* Lock Screen Content */
+        .screen-content {
+            position: relative; z-index: 10; height: 100%;
+            display: flex; flex-direction: column; align-items: center; padding-top: 80px;
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.5s ease;
+        }
+
+        .date { font-size: 20px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 5px; }
+        .time-wrapper { display: flex; align-items: center; justify-content: center; margin-top: -10px; font-family: 'Open Sans', sans-serif; }
+        .time-number { font-size: 98px; font-weight: 600; letter-spacing: -4px; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); font-variant-numeric: tabular-nums; }
+        .time-colon { font-size: 86px; font-weight: 500; margin: 0 2px; position: relative; top: -6px; opacity: 0.9; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        .notification-area { margin-top: auto; margin-bottom: 20px; width: 91%; display: flex; flex-direction: column; gap: 10px; z-index: 20; }
+        .notification-card {
+            background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px; padding: 12px 15px; display: flex; align-items: flex-start; gap: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.15);
+            transition: transform 0.2s ease; cursor: pointer;
+        }
+        .notification-card:active { transform: scale(0.96); background: rgba(255,255,255,0.35); }
+        .app-icon { margin-top: 4px; width: 38px; height: 38px; border-radius: 8px; overflow: hidden; background: white; display: flex; justify-content: center; align-items: center; }
+        .messenger-logo { width:80%; height: 80%; object-fit: cover; }
+        .noti-content { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-top: 2px;}
+        .noti-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+        .noti-title { font-weight: 600; font-size: 15px; }
+        .noti-time { font-size: 13px; color: rgba(255,255,255,0.6); }
+        .noti-message { font-size: 15px; line-height: 1.3; font-weight: 400;}
+
+        .bottom-actions { width: 100%; display: flex; justify-content: space-between; padding: 0 46px; margin-bottom: 50px; z-index: 20; }
+        .action-btn { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.2s; cursor: pointer; }
+        .action-btn img { width: 28px; height: 28px; object-fit: contain; }
+        .action-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.9); }
+
+        /* Passcode Screen */
+        .passcode-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; 
+            background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; align-items: center; padding-top: 100px;
+            opacity: 0; pointer-events: none; transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
+        }
+        .passcode-screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+        .passcode-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; margin-top: 60px; }
+        .passcode-hint { font-size: 14px; opacity: 0.7; margin-bottom: 25px; }
+        .passcode-dots { display: flex; gap: 15px; margin-bottom: 50px; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid white; background: transparent; transition: 0.2s; }
+        .dot.filled { background: white; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 25px; margin-bottom: 30px; }
+        .key-btn { width: 78px; height: 78px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: 400; transition: background 0.2s; cursor: pointer; }
+        .key-btn:active { background: rgba(255, 255, 255, 0.4); }
+        .cancel-btn { font-size: 16px; font-weight: 600; margin-top: 10px; cursor: pointer; padding: 10px; }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+        /* Couple Animation on Phone */
+        .couple-container-phone { position: absolute; top: 50px; width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; z-index: 60; pointer-events: none; }
+        .char-img { position: absolute; width: 110px; height: auto; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
+        .char-girl { left: 30px; } .char-boy { right: 30px; }
+        .couple-img { position: absolute; width: 220px; height: auto; opacity: 0; transform: scale(0.8); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 5px 15px rgba(255, 77, 109, 0.4)); top: 20px; }
+        .pass-text-container { margin-top: 90px; text-align: center; transition: opacity 0.4s ease, transform 0.4s ease; }
+        .pass-text-container.hidden { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+
+        /* Chat Screen */
+        .chat-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 150; 
+            display: flex; flex-direction: column;
+            background-image: url('nen1.jpg'); 
+            background-size: cover; background-position: center;
+            opacity: 0; pointer-events: none; transform: scale(0.95);
+            transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .chat-screen.active { opacity: 1; pointer-events: all; transform: scale(1); }
+        .chat-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.35); pointer-events: none; z-index: 0; }
+
+        .chat-header {
+            padding: 50px 15px 15px; display: flex; align-items: center; z-index: 10; color: white;
+            background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .back-btn { color: #f2386d; font-size: 24px; margin-right: 15px; cursor: pointer;}
+        .avatar-box { position: relative; margin-right: 12px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); object-fit: cover; }
+        .active-dot { width: 12px; height: 12px; background: #31a24c; border: 2px solid #000; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+        .user-info { flex: 1; }
+        .user-name { font-weight: 700; font-size: 17px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .user-status { font-size: 12px; opacity: 0.8; color: #ccc; }
+        .header-actions { display: flex; gap: 20px; color: #f2386d; font-size: 20px; }
+
+        .chat-area { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; z-index: 10; }
+
+        .bubble {
+            background: rgba(40, 40, 40, 0.65); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+            padding: 10px 16px; font-size: 16px; line-height: 1.4; color: white; max-width: 75%; align-self: flex-start;
+            transform-origin: left bottom; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .typing-indicator {
+            background-color: rgba(40, 40, 40, 0.65); backdrop-filter: blur(10px);
+            padding: 12px 15px; border-radius: 20px; align-self: flex-start; display: none;
+            gap: 4px; align-items: center; width: fit-content;
+        }
+        .typing-dot { width: 6px; height: 6px; background: #bbb; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Hộp quà & Hiệu ứng giữ */
+        .gift-container { 
+            align-self: center; margin-top: 100px; display: flex; flex-direction: column; align-items: center; 
+            cursor: pointer; opacity: 0; transform: translateY(20px); transition: 0.5s; 
+            position: relative;
+        }
+        .gift-container.show { opacity: 1; transform: translateY(0); }
+        .gift-img {
+            width: 150px; height: auto;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)) drop-shadow(0 0 25px #ff4d6d);
+            transform-origin: top center; 
+            animation: swing 1.5s ease-in-out infinite alternate; 
+        }
+        @keyframes swing { from { transform: rotate(8deg); } to { transform: rotate(-8deg); } }
+
+        .gift-container.holding .gift-img {
+            animation: intense-shake 0.1s infinite !important;
+            filter: drop-shadow(0 0 50px #fff) brightness(1.3);
+            transform: scale(1.1);
+        }
+        @keyframes intense-shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .chat-footer {
+            padding: 10px 15px 30px; display: flex; align-items: center; gap: 15px; z-index: 10;
+            background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .chat-footer i { font-size: 24px; color: #f2386d; cursor: pointer; }
+        .input-box { flex: 1; height: 38px; background: rgba(30, 30, 30, 0.8); border-radius: 20px; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); }
+        .placeholder { color: #888; font-size: 15px; }
+
+        .heart {
+            position: absolute; color: #ff4d6d; font-size: 20px;
+            animation: float 6s linear forwards; 
+            z-index: 5; opacity: 0; pointer-events: none; bottom: -50px;
+            text-shadow: 0 0 5px rgba(255, 77, 109, 0.8);
+        }
+        @keyframes float { 0% { transform: translate3d(0, 0, 0) scale(0.6) rotate(0deg); opacity: 0; } 10% { opacity: 0.9; } 100% { transform: translate3d(0, -900px, 0) scale(1.3) rotate(20deg); opacity: 0; } }
+
+        .confetti { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; z-index: 300; pointer-events: none; opacity: 0; }
+        @keyframes confetti-shoot { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(720deg); opacity: 0; } }
+
+        /* =========================================
+           PHẦN 2: KHÔNG GIAN 3D
+           ========================================= */
+        #love-phase {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50; display: none;
+            perspective: 1200px;
+            font-family: 'Cinzel', serif;
+            pointer-events: none; 
+        }
+        #love-phase.active-phase { display: flex; justify-content: center; align-items: center; pointer-events: auto; }
+
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+
+        /* Giao diện Avt & Ngày yêu 3D */
+        #center-ui {
+            position: absolute; z-index: 20; width: 100%; height: 100%; pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+            transform: scale(0.9);
+        }
+        
+        /* Đổi tên class này để không trùng với phone */
+        .couple-container-3d {
+            display: flex; align-items: center; justify-content: center; gap: 40px;
+            width: 90%; max-width: 800px;
+        }
+
+        .center-content { text-align: center; z-index: 20; display: flex; flex-direction: column; align-items: center; }
+        .days { font-size: 80px; color: #fff; text-shadow: 0 0 30px rgba(255, 77, 109, 1); font-weight: 700; line-height: 1; margin-bottom: 10px; }
+        .days-label { font-family: 'Dancing Script'; font-size: 32px; color: #ffb7c5; text-shadow: 0 0 10px #ff4d6d; white-space: nowrap; }
+        
+        /* Hiệu ứng trượt vào */
+        .person { display: flex; flex-direction: column; align-items: center; transition: transform 1s ease-out; }
+        .p-left { transform: translateX(-50px); opacity: 0; transition: all 1.5s ease; }
+        .p-right { transform: translateX(50px); opacity: 0; transition: all 1.5s ease; }
+        
+        /* Class kích hoạt hiện 3D UI */
+        .show-ui .p-left, .show-ui .p-right { transform: translateX(0); opacity: 1; }
+        .show-ui { opacity: 1 !important; transform: scale(1) !important; }
+        .explode-ui { opacity: 0 !important; transform: scale(1.5) !important; filter: blur(20px); pointer-events: none; }
+
+        .avatar-3d { width: 130px; height: 130px; border-radius: 50%; border: 4px solid #ff4d6d; object-fit: cover; box-shadow: 0 0 40px rgba(255, 77, 109, 0.6); background: #fff; margin-bottom: 15px; }
+        .name-3d { color: #fff; font-family: 'Dancing Script'; font-size: 28px; text-shadow: 0 0 10px #ff4d6d; }
+
+        /* Gallery */
+        #gallery-container { position: absolute; width: 100%; height: 100%; z-index: 10; pointer-events: none; opacity: 0; transition: opacity 1s ease; display: flex; justify-content: center; align-items: center; }
+        #drag-container, #spin-container { position: relative; display: flex; margin: auto; transform-style: preserve-3d; transform: rotateX(-10deg); }
+        #spin-container img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 10px; box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); border: 1px solid rgba(255, 182, 193, 0.5); object-fit: cover; cursor: pointer; transition: transform 1s; -webkit-box-reflect: below 10px linear-gradient(transparent, transparent 50%, rgba(255, 255, 255, 0.2)); }
+        .active-gallery { pointer-events: auto !important; opacity: 1 !important; }
+
+        #zoom-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; cursor: zoom-out; }
+        #zoom-container img { max-width: 95%; max-height: 80%; box-shadow: 0 0 30px #ff4d6d; border: 2px solid #fff; transform: scale(0.1); transition: transform 0.5s; }
+
+        /* Letter 3D */
+        #mail-trigger { position: fixed; bottom: 30px; right: 30px; z-index: 200; background: rgba(255, 255, 255, 0.1); border: 1px solid #ff4d6d; color: #ffb3c1; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-family: 'Dancing Script'; font-size: 20px; opacity: 0; pointer-events: none; transition: all 0.5s; display: flex; align-items: center; gap: 10px; box-shadow: 0 0 15px rgba(255, 77, 109, 0.3); }
+        .show-mail-btn { opacity: 1 !important; pointer-events: auto !important; animation: breathe 2s infinite; }
+        
+        #messenger-wrapper { position: fixed; inset: 0; display: none; justify-content: center; align-items: center; z-index: 300; font-family: 'Quicksand', sans-serif; pointer-events: none; }
+        #messenger-wrapper.active-msg { display: flex; pointer-events: auto; }
+        .messenger-inner { position: relative; width: 280px; height: 350px; display: flex; justify-content: center; align-items: center; }
+        .person-img { width: 100%; height: 100%; object-fit: contain; animation: flyIn 4s ease-out forwards, personFadeOut 1s ease-in forwards 7s; }
+        .letter-img-3d { position: absolute; width: 250px; bottom: 130px; left: 50%; transform: translateX(-50%) scale(0); z-index: 2; cursor: pointer; opacity: 0; transition: all 0.5s ease; }
+        
+        @keyframes flyIn { 0% { transform: translate(-100vw, 20vh) scale(0.5); opacity: 0; } 100% { transform: translate(0, 0) scale(1); opacity: 1; } }
+        @keyframes personFadeOut { to { opacity: 0; visibility: hidden; transform: scale(0.8); } }
+        .letter-ready { opacity: 1; transform: translateX(-50%) scale(1); animation: floatMsg 2s ease-in-out infinite; filter: drop-shadow(0 0 10px #ffc0cb); }
+        @keyframes floatMsg { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -15px) rotate(5deg); } }
+
+        .overlay-letter { position: fixed; inset: 0; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.5s; z-index: 400; backdrop-filter: blur(5px); }
+        .overlay-letter.active { opacity: 1; visibility: visible; }
+        .paper-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 90%; max-width: 450px; height: 80vh; max-height: 600px; background: linear-gradient(135deg, #fff0f5 0%, #ffe6eb 100%); padding: 30px; border-radius: 15px; z-index: 450; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 20px rgba(255, 77, 109, 0.4); display: flex; flex-direction: column; border: 2px solid #ffc0cb; font-family: 'Quicksand', sans-serif; }
+        .paper-card.open { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 30px rgba(255, 77, 109, 0.6); }
+        .card-body { overflow-y: auto; flex: 1; margin: 35px 0; padding: 0 5px; scrollbar-width: thin; scrollbar-color: #ffc0cb transparent; }
+        .card-title { font-family: 'Dancing Script', cursive; font-size: 1.8em; color: #d6336c; margin-top: 15px; text-align: center; }
+        .card-content { font-size: 1em; color: #5c3a45; line-height: 1.7; font-weight: 600; text-align: center; white-space: pre-line; }
+        .card-signature { font-family: 'Dancing Script', cursive; font-size: 1.4em; color: #d6336c; text-align: right; opacity: 0; transition: 1s; }
+        .close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #d6336c; font-size: 1.8em; cursor: pointer; z-index: 40; }
+        .corner-img-tl, .corner-img-br { position: absolute; width: 100px; height: 100px; object-fit: cover; border-radius: 50%; z-index: 35; }
+        .corner-img-tl { top: -5px; left: -5px; } .corner-img-br { bottom: -10px; right: -5px; }
+        .heart-fall { position: fixed; top: -10vh; color: #ff4d6d; animation: fall linear forwards; z-index: 500; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .couple-container-3d { gap: 15px; width: 100%; padding: 0 10px; }
+            .avatar-3d { width: 85px; height: 85px; margin-bottom: 5px; }
+            .days { font-size: 45px; margin-bottom: 5px; }
+            .name-3d { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="loveSong" loop>
+        <source src="My Love.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="phone-container" id="phoneContainer">
+        <div class="iphone-frame">
+            <div class="wallpaper"></div>
+            <div class="overlay"></div>
+            
+            <div class="dynamic-island-container">
+                <div class="dynamic-island">
+                    <div class="di-sensor"></div>
+                    <div class="di-camera"></div>
+                </div>
+            </div>
+
+            <div class="screen-content" id="mainScreen">
+                <div class="date" id="date-display">...</div>
+                <div class="time-wrapper">
+                    <span class="time-number" id="time-hour">--</span>
+                    <span class="time-colon">:</span>
+                    <span class="time-number" id="time-minute">--</span>
+                </div>
+                <div id="hearts-container"></div>
+                <div class="notification-area">
+                    <div class="notification-card" onclick="showPasscodeScreen()">
+                        <div class="app-icon">
+                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Facebook_Messenger_logo_2025.svg/1280px-Facebook_Messenger_logo_2025.svg.png" class="messenger-logo" alt="Messenger">
+                        </div>
+                        <div class="noti-content">
+                            <div class="noti-header">
+                                <span class="noti-title">Anh Thiện ❤️</span>
+                                <span class="noti-time">bây giờ</span>
+                            </div>
+                            <div class="noti-message">Nhắn cho em một điều bí mật...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-actions">
+                    <div class="action-btn"><img src="https://img.icons8.com/?size=100&id=59787&format=png&color=ffffff" alt="Flashlight"></div>
+                    <div class="action-btn"><img src="https://img.icons8.com/ios-glyphs/60/ffffff/camera.png" alt="Camera"></div>
+                </div>
+            </div>
+
+            <div class="passcode-screen" id="passcodeScreen">
+                <div class="couple-container-phone">
+                    <img src="px2.png" class="char-img char-girl" id="charGirl">
+                    <img src="px3.png" class="char-img char-boy" id="charBoy">
+                    <img src="px1.png" class="couple-img" id="coupleStanding">
+                    <img src="px4.png" class="couple-img" id="coupleKissing">
+                </div>
+                <div class="pass-text-container" id="passTextContainer">
+                    <div class="passcode-title">Nhập mật mã tình yêu</div>
+                    <div class="passcode-hint">Gợi ý: Ngày anh tỏ tình (?/08)</div>
+                </div>
+                <div class="passcode-dots" id="dotsContainer">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+                <div class="keypad">
+                    <div class="key-btn" onclick="addNumber(1)">1</div>
+                    <div class="key-btn" onclick="addNumber(2)">2</div>
+                    <div class="key-btn" onclick="addNumber(3)">3</div>
+                    <div class="key-btn" onclick="addNumber(4)">4</div>
+                    <div class="key-btn" onclick="addNumber(5)">5</div>
+                    <div class="key-btn" onclick="addNumber(6)">6</div>
+                    <div class="key-btn" onclick="addNumber(7)">7</div>
+                    <div class="key-btn" onclick="addNumber(8)">8</div>
+                    <div class="key-btn" onclick="addNumber(9)">9</div>
+                    <div class="key-btn" style="opacity:0; pointer-events:none"></div>
+                    <div class="key-btn" onclick="addNumber(0)">0</div>
+                    <div class="key-btn" style="opacity:0; pointer-events:none"></div>
+                </div>
+                <div class="cancel-btn" onclick="hidePasscodeScreen()">Hủy</div>
+            </div>
+
+            <div class="chat-screen" id="chatScreen">
+                <div class="chat-header">
+                    <i class="fas fa-chevron-left back-btn" onclick="location.reload()"></i>
+                    <div class="avatar-box"><img src="nen3.jpg" class="avatar"><div class="active-dot"></div></div>
+                    <div class="user-info">
+                        <div class="user-name">Anh Thiện ❤️</div>
+                        <div class="user-status">Đang hoạt động</div>
+                    </div>
+                    <div class="header-actions"><i class="fa-solid fa-phone"></i><i class="fas fa-video"></i></div>
+                </div>
+                <div class="chat-area" id="chatArea">
+                    <div class="typing-indicator" id="typing">
+                        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                    </div>
+                    <div class="gift-container" id="giftBox">
+                        <img src="qua.png" class="gift-img" alt="Hộp quà">
+                        <div style="font-size: 13px; color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.8); margin-top: 10px;">
+                            Ấn giữ 2s để mở quà! ❤️
+                        </div>
+                    </div>
+                    <div style="height: 10px;"></div>
+                </div>
+                <div class="chat-footer">
+                    <i class="fas fa-plus-circle"></i>
+                    <i class="fas fa-camera"></i>
+                    <i class="fas fa-image"></i>
+                    <i class="fas fa-microphone"></i>
+                    <div class="input-box"><span class="placeholder">Aa</span><i class="far fa-smile" style="color: #f2386d;"></i></div>
+                    <i class="fas fa-heart" style="color: #ff4d6d;"></i>
+                </div>
+            </div>
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+
+    <div id="love-phase">
+        <canvas id="canvas"></canvas>
+        <div id="center-ui">
+            <div class="couple-container-3d">
+                <div class="person p-left">
+                    <img src="nen2.jpg" class="avatar-3d" alt="Boy">
+                    <div class="name-3d">Thiện</div>
+                </div>
+                <div class="center-content">
+                    <div class="days" id="days-count">0</div>
+                    <div class="days-label">Ngày yêu thương</div>
+                </div>
+                <div class="person p-right">
+                    <img src="nen4.jpg" class="avatar-3d" alt="Girl">
+                    <div class="name-3d">Quỳnh Anh</div>
+                </div>
+            </div>
+        </div>
+        <div id="gallery-container">
+            <div id="drag-container">
+                <div id="spin-container">
+                    <img src="nen1.jpg" alt="1">
+                    <img src="nen2.jpg" alt="2">
+                    <img src="nen3.jpg" alt="3">
+                    <img src="nen4.jpg" alt="4">
+                    <img src="nen5.jpg" alt="5">
+                    <img src="nen6.jpg" alt="6">    
+                    <img src="nen7.jpg" alt="7">
+                    <img src="nen8.jpg" alt="8">
+                    <img src="nen9.jpg" alt="9">
+                    <img src="nen10.jpg" alt="10">
+                </div>
+            </div>
+        </div>
+        <div id="zoom-container"><img id="zoomed-img" src=""></div>
+        
+        <div id="mail-trigger" onclick="activateLetter()"><span>✉️</span> Gửi Em</div>
+        
+        <div id="messenger-wrapper">
+            <div class="messenger-inner">
+                <img src="thu.png" class="person-img" id="person-msg">
+                <img src="thu1.png" class="letter-img-3d" id="letter-msg">
+            </div>
+        </div>
+        <div class="overlay-letter" id="overlay-letter"></div>
+        
+        <div class="paper-card" id="paper-card">
+            <img src="trai.png" class="corner-img-tl">
+            <img src="gai.png" class="corner-img-br">
+            <button class="close-btn" onclick="closeLetter()">&times;</button>
+            <div class="card-body">
+                <h1 class="card-title" id="type-title"></h1>
+                <div class="card-content" id="type-content"></div>
+                <div class="card-signature" id="type-signature">Mãi iu em ❤️<br>#Thienr_k</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // LOGIC PHONE
+        const correctPasscode = "1708";
+        let currentInput = "";
+
+        function resizePhone() {
+            const container = document.getElementById('phoneContainer');
+            if(!container) return;
+            const scale = Math.min((window.innerWidth - 20) / 435, (window.innerHeight - 20) / 900, 1);
+            container.style.transform = `scale(${scale})`;
+        }
+        window.addEventListener('load', resizePhone); window.addEventListener('resize', resizePhone);
+
+        function updateDateTime() {
+            const now = new Date();
+            let h = now.getHours(), m = now.getMinutes();
+            document.getElementById('time-hour').innerText = h < 10 ? '0'+h : h;
+            document.getElementById('time-minute').innerText = m < 10 ? '0'+m : m;
+            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+            document.getElementById('date-display').innerText = `${days[now.getDay()]}, ${now.getDate()} tháng ${now.getMonth()+1}`;
+        }
+        setInterval(updateDateTime, 1000); updateDateTime();
+
+        function createHeart() {
+            if (document.getElementById('passcodeScreen').classList.contains('active') || 
+                document.getElementById('chatScreen').classList.contains('active') ||
+                document.getElementById('love-phase').classList.contains('active-phase')) return;
+            const container = document.querySelector('.iphone-frame');
+            if (document.querySelectorAll('.heart').length > 15) return;
+            const heart = document.createElement('div'); heart.classList.add('heart');
+            heart.style.left = (Math.random() * 80 + 10) + '%';
+            const icons = ['❤️', '💖', '💕', '🥰', '😘']; heart.innerText = icons[Math.floor(Math.random() * icons.length)];
+            heart.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            container.appendChild(heart); setTimeout(() => heart.remove(), 8000);
+        }
+        setInterval(createHeart, 800);
+
+        function showPasscodeScreen() {
+            document.getElementById('passcodeScreen').classList.add('active');
+            const mainScreen = document.getElementById('mainScreen');
+            mainScreen.style.transform = "scale(0.85)"; mainScreen.style.opacity = "0.5"; mainScreen.style.filter = "blur(10px)";
+        }
+        function hidePasscodeScreen() {
+            document.getElementById('passcodeScreen').classList.remove('active');
+            const mainScreen = document.getElementById('mainScreen');
+            mainScreen.style.transform = "scale(1)"; mainScreen.style.opacity = "1"; mainScreen.style.filter = "none";
+            clearPasscode();
+        }
+        function addNumber(num) {
+            if (currentInput.length < 4) { currentInput += num; updateDots(); updateCoupleState(); if (currentInput.length === 4) setTimeout(checkPasscode, 200); }
+        }
+        function updateDots() { document.querySelectorAll('.dot').forEach((dot, i) => { i < currentInput.length ? dot.classList.add('filled') : dot.classList.remove('filled'); }); }
+        function clearPasscode() { currentInput = ""; updateDots(); resetCoupleState(); }
+        function resetCoupleState() {
+            const g = document.getElementById('charGirl'), b = document.getElementById('charBoy');
+            g.style.transform = `translateX(0)`; g.style.opacity = '1'; b.style.transform = `translateX(0)`; b.style.opacity = '1';
+            document.getElementById('coupleStanding').style.opacity = '0'; document.getElementById('coupleKissing').style.opacity = '0';
+            document.getElementById('passTextContainer').classList.remove('hidden');
+        }
+        function checkPasscode() {
+            if (currentInput === correctPasscode) {
+                document.getElementById('passTextContainer').classList.add('hidden');
+                document.getElementById('coupleStanding').style.opacity = '0';
+                const kiss = document.getElementById('coupleKissing'); kiss.style.opacity = '1'; kiss.style.transform = 'scale(1.3)';
+                const colors = ['#ff4d6d', '#ffb3c1', '#ffffff', '#ffd700'];
+                for (let i = 0; i < 50; i++) {
+                    const c = document.createElement('div'); c.classList.add('confetti');
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.setProperty('--tx', (Math.random()-0.5)*400+'px'); c.style.setProperty('--ty', (Math.random()-1)*400+'px');
+                    c.style.animation = `confetti-shoot ${1+Math.random()}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
+                    document.getElementById('passcodeScreen').appendChild(c); setTimeout(()=>c.remove(), 2000);
+                }
+                setTimeout(() => { document.getElementById('passcodeScreen').classList.remove('active'); startChat(); }, 2500);
+            } else {
+                const d = document.getElementById('dotsContainer'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
+                setTimeout(() => { clearPasscode(); }, 500);
+            }
+        }
+        function updateCoupleState() {
+            const len = currentInput.length, g = document.getElementById('charGirl'), b = document.getElementById('charBoy');
+            if (len < 3) {
+                document.getElementById('passTextContainer').classList.remove('hidden'); 
+                g.style.transform = `translateX(${len*60}px)`; b.style.transform = `translateX(-${len*60}px)`;
+                document.getElementById('coupleStanding').style.opacity = '0'; 
+            } else {
+                document.getElementById('passTextContainer').classList.add('hidden'); g.style.opacity = '0'; b.style.opacity = '0';
+                if (len >= 3) { const s = document.getElementById('coupleStanding'); s.style.opacity = '1'; s.style.transform = 'scale(1.1)'; }
+            }
+        }
+
+        const messages = ["Hello bé iu ❤️", "Hôm nay là ngày Valentine ấy !", "Giờ người ta mới code xong 🫣", "Em iu thông cảm nhó hihi","Giờ đây...", "Anh có một chút bất ngờ dành cho em nè 👇"];
+        async function startChat() {
+            document.getElementById('chatScreen').classList.add('active');
+            const chatArea = document.getElementById('chatArea'), typing = document.getElementById('typing'), giftBox = document.getElementById('giftBox');
+            await new Promise(r => setTimeout(r, 1000));
+            for (let i = 0; i < messages.length; i++) {
+                typing.style.display = 'flex'; chatArea.scrollTop = chatArea.scrollHeight;
+                await new Promise(r => setTimeout(r, Math.max(1000, messages[i].length * 50)));
+                typing.style.display = 'none';
+                const b = document.createElement('div'); b.className = 'bubble'; b.innerText = messages[i];
+                chatArea.insertBefore(b, typing); chatArea.scrollTop = chatArea.scrollHeight;
+                await new Promise(r => setTimeout(r, 1200));
+            }
+            setTimeout(() => { giftBox.classList.add('show'); chatArea.scrollTop = chatArea.scrollHeight; setupGiftBoxHold(); }, 500);
+        }
+
+        // LOGIC CHUYỂN CẢNH (HOLD 2S)
+        function setupGiftBoxHold() {
+            const giftBox = document.getElementById('giftBox');
+            let holdTimer = null, isHolding = false;
+            const startHold = (e) => {
+                e.preventDefault(); if (isHolding) return; isHolding = true; giftBox.classList.add('holding');
+                holdTimer = setTimeout(() => { giftBox.classList.remove('holding'); triggerPhase2Transition(); }, 2000);
+            };
+            const endHold = () => { if (!isHolding) return; isHolding = false; giftBox.classList.remove('holding'); if (holdTimer) clearTimeout(holdTimer); };
+            giftBox.addEventListener('mousedown', startHold); giftBox.addEventListener('mouseup', endHold); giftBox.addEventListener('mouseleave', endHold);
+            giftBox.addEventListener('touchstart', startHold, {passive: false}); giftBox.addEventListener('touchend', endHold); giftBox.addEventListener('touchcancel', endHold);
+        }
+
+        function triggerPhase2Transition() {
+            const audio = document.getElementById("loveSong"); audio.volume = 1.0; audio.play().catch(e => console.log("Lỗi play nhạc"));
+            const phone = document.getElementById('phoneContainer');
+            phone.classList.add('fade-out'); // Kích hoạt CSS mờ dần
+            document.body.classList.add('mode-3d'); // Đổi nền body sang đen
+
+            // QUAN TRỌNG: Đợi 1.5s cho hiệu ứng mờ xong rồi mới ẩn hẳn (display: none)
+            setTimeout(() => {
+                phone.style.display = 'none'; 
+            }, 1500);
+
+            const lovePhase = document.getElementById('love-phase');
+            lovePhase.style.display = 'block';
+            setTimeout(() => {
+                lovePhase.classList.add('active-phase');
+                startParticleSystem(); 
+            }, 100);
+        }
+
+        // LOGIC 3D
+        const START_DATE = "2025-08-17"; 
+        function updateDays() {
+            const diff = Math.floor((new Date() - new Date(START_DATE)) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-count').innerText = diff;
+        }
+        updateDays(); 
+
+        const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+        let width, height;
+        const T1_SCATTER = 4, T2_GATHER = 7, T3_BEAT = 15, T4_EXPLODE = 20;
+        const CFG = { pCount: 5000, color: '#ff4d6d', heartSize: 35 };
+        let particles = [], startTime = null;
+        let uiShown = false, uiHidden = false, galleryShown = false, mailBtnShown = false;
+
+        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        function getHeartPos(t) { return { x: 16*Math.pow(Math.sin(t),3), y: -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)) }; }
+
+        class Particle {
+            constructor() {
+                this.x=0; this.y=0; this.z=0;
+                this.sX = (Math.random()-0.5)*width*3; this.sY = (Math.random()-0.5)*height*3; this.sZ = (Math.random()-0.5)*3000;
+                const t = Math.random()*Math.PI*2, h = getHeartPos(t), d = (Math.random()-0.5)*3;
+                this.tX = h.x*CFG.heartSize; this.tY = h.y*CFG.heartSize; this.tZ = d*CFG.heartSize;
+                this.eX = (Math.random()-0.5)*width*4; this.eY = (Math.random()-0.5)*height*4; this.eZ = (Math.random()-0.5)*4000;
+                this.size = Math.random()*2+0.5; this.alpha = 1;
+                this.spS = 0.01+Math.random()*0.02; this.spH = 0.04+Math.random()*0.02; this.spE = 0.015+Math.random()*0.015;
+                this.blink = Math.random()*Math.PI*2;
+            }
+            update(phase, rY, beat, time) {
+                if (phase === 'scatter') { this.x+=(this.sX-this.x)*this.spS; this.y+=(this.sY-this.y)*this.spS; this.z+=(this.sZ-this.z)*this.spS; }
+                else if (phase === 'gather') {
+                    let rx = this.tX*beat*Math.cos(rY) - this.tZ*beat*Math.sin(rY), rz = this.tX*beat*Math.sin(rY) + this.tZ*beat*Math.cos(rY);
+                    this.x+=(rx-this.x)*this.spH; this.y+=(this.tY*beat-this.y)*this.spH; this.z+=(rz-this.z)*this.spH;
+                } else if (phase === 'beat') {
+                    this.x+=(this.tX*beat-this.x)*this.spH; this.y+=(this.tY*beat-this.y)*this.spH; this.z+=(this.tZ*beat-this.z)*this.spH;
+                } else {
+                    this.x+=(this.eX-this.x)*this.spE; this.y+=(this.eY-this.y)*this.spE; this.z+=(this.eZ-this.z)*this.spE;
+                    this.alpha = 0.2 + 0.8*(Math.sin(time*0.002+this.blink)*0.5+0.5);
+                }
+                this.sc = 400/(400+this.z+1000); this.pX = width/2+this.x*this.sc; this.pY = height/2+this.y*this.sc;
+            }
+            draw(ctx) { if(this.sc>0) { ctx.globalAlpha=this.alpha; ctx.fillStyle=CFG.color; ctx.beginPath(); ctx.arc(this.pX, this.pY, this.size*this.sc, 0, Math.PI*2); ctx.fill(); } }
+        }
+
+        function loop(t) {
+            if (!startTime) startTime = t;
+            let el = (t - startTime)/1000;
+            ctx.clearRect(0, 0, width, height);
+            let phase = 'scatter', rY = 0, beat = 1;
+
+            if (el < T1_SCATTER) phase = 'scatter';
+            else if (el < T2_GATHER) { phase = 'gather'; rY = (el - T1_SCATTER); }
+            else if (el < T3_BEAT) { 
+                phase = 'beat'; 
+                beat = 1 + 0.08*Math.pow(Math.sin((el-T2_GATHER)*3), 63); 
+                // KÍCH HOẠT UI NGÀY YÊU & AVT TẠI ĐÂY
+                if(!uiShown){ document.getElementById('center-ui').classList.add('show-ui'); uiShown=true;} 
+            }
+            else if (el < T4_EXPLODE) { 
+                phase = 'explode'; 
+                if(!uiHidden){ document.getElementById('center-ui').classList.remove('show-ui'); document.getElementById('center-ui').classList.add('explode-ui'); uiHidden=true;} 
+            }
+            else { 
+                phase = 'drift'; 
+                if(!galleryShown){ initGallery(); galleryShown=true;} 
+                if(!mailBtnShown && el > T4_EXPLODE+1){ document.getElementById('mail-trigger').classList.add('show-mail-btn'); mailBtnShown=true;} 
+            }
+            particles.forEach(p => { p.update(phase, rY, beat, t); p.draw(ctx); });
+            requestAnimationFrame(loop);
+        }
+        function startParticleSystem() { particles = []; for(let i=0; i<CFG.pCount; i++) particles.push(new Particle()); requestAnimationFrame(loop); }
+
+        const ospin = document.getElementById('spin-container'), odrag = document.getElementById('drag-container'), aImg = ospin.getElementsByTagName('img');
+        let autoSpin = null, tX = 0, tY = 10;
+        if(window.innerWidth < 768) { ospin.style.width = "90px"; ospin.style.height = "130px"; } else { ospin.style.width = "120px"; ospin.style.height = "170px"; }
+        function initGallery() {
+            document.getElementById('gallery-container').classList.add('active-gallery');
+            let radius = window.innerWidth < 768 ? 140 : 240;
+            for (let i = 0; i < aImg.length; i++) {
+                aImg[i].style.transform = `rotateY(${i*(360/aImg.length)}deg) translateZ(${radius}px)`;
+                aImg[i].style.transitionDelay = i/4 + "s"; aImg[i].onclick = function() { showZoom(this.src); };
+            }
+            setTimeout(() => { if(!autoSpin) autoSpin = requestAnimationFrame(spinLoop); }, 1000);
+        }
+        function applyTran() { if(tY>180) tY=180; if(tY<0) tY=0; odrag.style.transform = `rotateX(${-tY}deg) rotateY(${tX}deg)`; }
+        function spinLoop() { tX -= 0.1; applyTran(); autoSpin = requestAnimationFrame(spinLoop); }
+        document.getElementById('gallery-container').onpointerdown = function(e) {
+            if(!galleryShown) return;
+            cancelAnimationFrame(autoSpin); autoSpin=null; let sX = e.clientX, sY = e.clientY;
+            this.onpointermove = function(e) { tX += (e.clientX-sX)*0.1; tY += (e.clientY-sY)*0.1; applyTran(); sX=e.clientX; sY=e.clientY; };
+            this.onpointerup = function() { this.onpointermove = null; if(!autoSpin) autoSpin = requestAnimationFrame(spinLoop); };
+            return false;
+        };
+        const zoomC = document.getElementById('zoom-container'), zImg = document.getElementById('zoomed-img');
+        function showZoom(src) { cancelAnimationFrame(autoSpin); autoSpin=null; zImg.src = src; zoomC.style.display = 'flex'; setTimeout(() => zImg.style.transform = 'scale(1)', 50); }
+        zoomC.onclick = function() { zImg.style.transform = 'scale(0.1)'; setTimeout(() => { this.style.display = 'none'; if(!autoSpin) autoSpin = requestAnimationFrame(spinLoop); }, 500); };
+
+        const titleText = "Chúc mừng ngày Valentine", msgText = "Anh có đôi điều nhắn nhủ tới em.\n\nHy vọng nhiều năm sau nữa, anh và em vẫn cùng nhau nắm tay đi qua tất cả thăng trầm của cuộc sống.\n\nCảm ơn vì chúng ta đã gặp được nhau.\n\nVì yêu mà đến, vì thương mà ở lại, vì hiểu nhau mà nhường nhịn nhau đến hiện tại.\n\nChúc anh và em sẽ luôn vui vẻ và hạnh phúc, mãi bên nhau nhé! \n❤️";
+        let typeTimer;
+        function activateLetter() {
+            document.getElementById('gallery-container').classList.remove('active-gallery');
+            document.getElementById('gallery-container').style.opacity = '0';
+            document.getElementById('mail-trigger').style.display = 'none';
+            document.getElementById('messenger-wrapper').classList.add('active-msg');
+            setTimeout(() => { const l = document.getElementById('letter-msg'); l.classList.add('letter-ready'); l.onclick = openLetter; document.getElementById('person-msg').style.display = 'none'; }, 8000);
+        }
+        function openLetter() {
+            document.getElementById('letter-msg').style.display = 'none';
+            document.getElementById('overlay-letter').classList.add('active');
+            document.getElementById('paper-card').classList.add('open');
+            document.getElementById('type-title').innerHTML = ""; document.getElementById('type-content').innerHTML = ""; document.getElementById('type-signature').style.opacity = "0";
+            setTimeout(startType, 800); createHearts3D();
+        }
+        function startType() {
+            let i=0, j=0;
+            function typeT() { if(i<titleText.length) { document.getElementById('type-title').innerHTML += titleText.charAt(i++); typeTimer=setTimeout(typeT, 80); } else typeC(); }
+            function typeC() { if(j<msgText.length) { let c = msgText.charAt(j++); document.getElementById('type-content').innerHTML += c==='\n'?'<br>':c; document.querySelector('.card-body').scrollTop = document.querySelector('.card-body').scrollHeight; typeTimer=setTimeout(typeC, 55); } else document.getElementById('type-signature').style.opacity = "1"; }
+            typeT();
+        }
+        function closeLetter() {
+            clearTimeout(typeTimer);
+            document.getElementById('overlay-letter').classList.remove('active');
+            document.getElementById('paper-card').classList.remove('open');
+            setTimeout(() => { document.getElementById('letter-msg').style.display = 'block'; }, 500);
+        }
+        function createHearts3D() {
+            for(let i=0; i<25; i++) {
+                setTimeout(() => {
+                    const h = document.createElement('div'); h.classList.add('heart-fall'); h.innerHTML = '❤';
+                    h.style.left = Math.random()*100+'vw'; h.style.animationDuration = Math.random()*3+2+'s'; h.style.fontSize = Math.random()*15+10+'px';
+                    document.body.appendChild(h); setTimeout(()=>h.remove(), 5000);
+                }, i*150);
+            }
+        }
+    </script>
+</body>
+</html>

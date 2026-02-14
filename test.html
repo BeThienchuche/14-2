@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Cinematic Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* --- 1. HỘP QUÀ --- */
+        #gift-box {
+            position: absolute;
+            z-index: 100;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 1s ease-in-out;
+        }
+        .box-body {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #ff4d6d, #a4133c);
+            position: relative;
+            box-shadow: 0 0 50px rgba(255, 77, 109, 0.4);
+            animation: bounce 2s infinite ease-in-out;
+            border: 2px solid #fff0f3;
+        }
+        .box-lid {
+            position: absolute;
+            width: 94px; height: 25px;
+            background: #ff8fa3;
+            top: -15px; left: -7px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 2px solid #fff0f3;
+        }
+        .ribbon { position: absolute; background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .r-v { width: 18px; height: 100%; left: 50%; transform: translateX(-50%); }
+        .r-h { width: 100%; height: 18px; top: 50%; transform: translateY(-50%); }
+        .guide-text {
+            color: #ffb3c1; margin-top: 20px;
+            font-family: 'Dancing Script', cursive; font-size: 22px;
+            letter-spacing: 1px; animation: breathe 2s infinite;
+        }
+
+        /* --- 2. CANVAS --- */
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; }
+
+        /* --- 3. UI FINAL --- */
+        #final-ui {
+            position: absolute; z-index: 10;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 3s ease; 
+        }
+        .center-content {
+            position: absolute; text-align: center; z-index: 20;
+            transform: scale(0.8); transition: transform 3s ease-out;
+        }
+        .days {
+            font-size: 70px; color: #fff;
+            text-shadow: 0 0 30px rgba(255, 77, 109, 0.8); font-weight: 700;
+        }
+        .days-label { font-family: 'Dancing Script'; font-size: 30px; color: #ffb7c5; }
+        .couple {
+            position: absolute; width: 70%;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .person {
+            display: flex; flex-direction: column; align-items: center;
+            opacity: 0; transition: all 2.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .avatar {
+            width: 150px; height: 150px; border-radius: 50%;
+            border: 3px solid #ff4d6d; object-fit: cover;
+            box-shadow: 0 0 40px rgba(255, 77, 109, 0.5); margin-bottom: 15px;
+        }
+        .name { color: #fff; font-family: 'Dancing Script'; font-size: 32px; text-shadow: 0 0 15px #ff4d6d; }
+
+        /* --- 4. CLICK TEXT (Cuối cùng) --- */
+        #click-hint {
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+            color: #fff; font-family: 'Dancing Script'; font-size: 24px;
+            opacity: 0; transition: opacity 2s; z-index: 30;
+            text-shadow: 0 0 10px #fff;
+        }
+
+        /* ANIMATIONS */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.02); }
+        }
+        @keyframes breathe { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        .hide-box { transform: scale(0) rotate(180deg); opacity: 0; pointer-events: none; }
+        .show-ui { opacity: 1 !important; }
+        .scale-up { transform: scale(1) !important; }
+        #p-left { transform: translateX(-150px); }
+        #p-right { transform: translateX(150px); }
+        .slide-in { opacity: 1 !important; transform: translateX(0) !important; }
+        .fade-out { opacity: 0 !important; transition: opacity 2s ease; }
+    </style>
+</head>
+<body>
+
+    <div id="gift-box" onclick="startShow()">
+        <div class="box-body">
+            <div class="ribbon r-v"></div>
+            <div class="ribbon r-h"></div>
+            <div class="box-lid"></div>
+        </div>
+        <div class="guide-text">Chạm nhẹ để mở quà ❤️</div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="final-ui">
+        <div class="couple">
+            <div class="person" id="p-left">
+                <img src="https://via.placeholder.com/200/87CEEB/FFFFFF?text=Sin" class="avatar">
+                <div class="name">Sin</div>
+            </div>
+            <div class="person" id="p-right">
+                <img src="https://via.placeholder.com/200/FFB6C1/FFFFFF?text=Yi" class="avatar">
+                <div class="name">Yi</div>
+            </div>
+        </div>
+        <div class="center-content" id="center-text">
+            <div class="days">993</div>
+            <div class="days-label">Ngày yêu thương</div>
+        </div>
+    </div>
+
+    <div id="click-hint">Click vào nhé ❤️</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    // --- DANH SÁCH ẢNH (BẠN THAY LINK ẢNH CỦA BẠN VÀO ĐÂY) ---
+    // Để đẹp nhất thì nên dùng khoảng 10-20 ảnh
+    const imgUrls = [
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+1",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+2",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+3",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+4",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+5",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+6",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+7",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+8",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+9",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+10",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+11",
+        "https://via.placeholder.com/300x400/ff758c/fff?text=Love+12"
+    ];
+
+    // --- CẤU HÌNH THỜI GIAN ---
+    const TIME_SCATTER = 4;
+    const TIME_GATHER  = 4;
+    const TIME_BEAT    = 10; 
+    const TIME_EXPLODE = 3; // Thời gian nổ trước khi hiện ảnh
+    // Tổng time trước khi hiện ảnh = 4+4+10+3 = 21s
+
+    const CFG = {
+        pCount: 4000,
+        color: '#ff4d6d',
+        heartSize: 16,
+        scatterRadius: 1200,
+        sphereRadius: 450 // Bán kính quả cầu ảnh
+    };
+
+    let particles = [];
+    let photos = [];
+    let startTime = null;
+    let imagesLoaded = [];
+
+    // Load ảnh trước
+    function preloadImages() {
+        imgUrls.forEach(url => {
+            const img = new Image();
+            img.src = url;
+            imagesLoaded.push(img);
+        });
+    }
+    preloadImages();
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- CLASS HẠT BỤI ---
+    function getHeartPos(t) {
+        return {
+            x: 16 * Math.pow(Math.sin(t), 3),
+            y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
+        };
+    }
+
+    class Particle {
+        constructor() {
+            this.x = 0; this.y = 0; this.z = 0;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            const r = (Math.random() * 0.8 + 0.2) * CFG.scatterRadius;
+            this.scatterX = r * Math.sin(phi) * Math.cos(theta);
+            this.scatterY = r * Math.sin(phi) * Math.sin(theta);
+            this.scatterZ = r * Math.cos(phi);
+
+            const t = Math.random() * Math.PI * 2;
+            const h = getHeartPos(t);
+            const d = (Math.random() - 0.5) * 6;
+            this.targetX = h.x * CFG.heartSize;
+            this.targetY = h.y * CFG.heartSize;
+            this.targetZ = d * CFG.heartSize;
+
+            this.starX = (Math.random() - 0.5) * width * 3; 
+            this.starY = (Math.random() - 0.5) * height * 3;
+            this.starZ = (Math.random() - 0.5) * 3000; 
+
+            this.size = Math.random() * 2 + 0.5;
+            this.smoothScatter = 0.003 + Math.random() * 0.005; 
+            this.smoothGather  = 0.02 + Math.random() * 0.03; 
+            this.smoothStar    = 0.01 + Math.random() * 0.02;
+
+            this.alpha = 1;
+            this.blinkOffset = Math.random() * Math.PI * 2;
+            this.blinkSpeed = 0.002 + Math.random() * 0.005;
+        }
+        update(phase, rotationY, beatScale, timestamp) {
+            if (phase === 'scatter') {
+                this.x += (this.scatterX - this.x) * this.smoothScatter;
+                this.y += (this.scatterY - this.y) * this.smoothScatter;
+                this.z += (this.scatterZ - this.z) * this.smoothScatter;
+            } else if (phase === 'gather' || phase === 'beat') {
+                let tx = this.targetX * beatScale;
+                let ty = this.targetY * beatScale;
+                let tz = this.targetZ * beatScale;
+                this.x += (tx - this.x) * this.smoothGather;
+                this.y += (ty - this.y) * this.smoothGather;
+                this.z += (tz - this.z) * this.smoothGather;
+            } else if (phase === 'explode' || phase === 'sphere') {
+                this.x += (this.starX - this.x) * this.smoothStar;
+                this.y += (this.starY - this.y) * this.smoothStar;
+                this.z += (this.starZ - this.z) * this.smoothStar;
+                const blink = Math.sin(timestamp * this.blinkSpeed + this.blinkOffset); 
+                this.alpha = 0.2 + 0.6 * (blink * 0.5 + 0.5);
+            }
+
+            let rx = this.x, rz = this.z;
+            if (phase !== 'explode' && phase !== 'sphere') {
+                rx = this.x * Math.cos(rotationY) - this.z * Math.sin(rotationY);
+                rz = this.x * Math.sin(rotationY) + this.z * Math.cos(rotationY);
+            }
+
+            const fov = 400;
+            const scale = fov / (fov + rz + 200);
+            this.screenX = width / 2 + rx * scale;
+            this.screenY = height / 2 + this.y * scale;
+            this.screenScale = scale;
+        }
+        draw(ctx) {
+            if (this.screenScale <= 0) return;
+            ctx.globalAlpha = this.alpha;
+            ctx.fillStyle = CFG.color;
+            ctx.beginPath();
+            ctx.arc(this.screenX, this.screenY, this.size * this.screenScale, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // --- CLASS ẢNH 3D ---
+    class Photo {
+        constructor(img, index, total) {
+            this.img = img;
+            // Fibonacci Sphere Algorithm để phân bố đều các điểm trên mặt cầu
+            const phi = Math.acos(-1 + (2 * index) / total);
+            const theta = Math.sqrt(total * Math.PI) * phi;
+            
+            this.targetX = CFG.sphereRadius * Math.cos(theta) * Math.sin(phi);
+            this.targetY = CFG.sphereRadius * Math.sin(theta) * Math.sin(phi);
+            this.targetZ = CFG.sphereRadius * Math.cos(phi);
+
+            // Bắt đầu từ xa tít
+            this.x = (Math.random() - 0.5) * 2000;
+            this.y = (Math.random() - 0.5) * 2000;
+            this.z = 2000; // Bay từ phía sau tới
+
+            this.rotationY = 0;
+            this.smoothMove = 0.03; 
+        }
+
+        update(rotationSpeed) {
+            // Di chuyển về vị trí trên mặt cầu
+            this.x += (this.targetX - this.x) * this.smoothMove;
+            this.y += (this.targetY - this.y) * this.smoothMove;
+            this.z += (this.targetZ - this.z) * this.smoothMove;
+
+            // Xoay toàn bộ hệ trục toạ độ
+            this.currentRotation = rotationSpeed;
+            
+            // Công thức xoay 3D quanh trục Y
+            let rx = this.x * Math.cos(this.currentRotation) - this.z * Math.sin(this.currentRotation);
+            let rz = this.x * Math.sin(this.currentRotation) + this.z * Math.cos(this.currentRotation);
+
+            // Chiếu 3D
+            const fov = 400;
+            const scale = fov / (fov + rz + 600); // +600 để đẩy lùi camera ra chút
+
+            this.screenX = width / 2 + rx * scale;
+            this.screenY = height / 2 + this.y * scale;
+            this.scale = scale;
+            this.zIndex = rz; // Dùng để sắp xếp lớp
+        }
+
+        draw(ctx) {
+            if (this.scale <= 0) return;
+            // Kích thước ảnh
+            const w = 120 * this.scale;
+            const h = 160 * this.scale;
+            
+            ctx.save();
+            ctx.globalAlpha = Math.min(1, (this.scale * 1.5)); // Mờ đi khi ở xa
+            // Vẽ ảnh
+            ctx.translate(this.screenX, this.screenY);
+            
+            // Viền ảnh
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(-w/2 - 2, -h/2 - 2, w+4, h+4);
+            
+            ctx.drawImage(this.img, -w/2, -h/2, w, h);
+            ctx.restore();
+        }
+    }
+
+    function init() {
+        particles = [];
+        for(let i=0; i<CFG.pCount; i++) particles.push(new Particle());
+        
+        photos = [];
+        imagesLoaded.forEach((img, i) => {
+            photos.push(new Photo(img, i, imagesLoaded.length));
+        });
+    }
+
+    function loop(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let elapsed = (timestamp - startTime) / 1000;
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        let phase = 'scatter';
+        let rotationY = 0;
+        let beatScale = 1;
+
+        // 1. SCATTER
+        if (elapsed < TIME_SCATTER) {
+            phase = 'scatter';
+            rotationY = elapsed * 0.2;
+        }
+        // 2. GATHER
+        else if (elapsed < TIME_SCATTER + TIME_GATHER) {
+            phase = 'gather';
+            rotationY = Math.PI * (1 - (elapsed - TIME_SCATTER) / TIME_GATHER); 
+        } 
+        // 3. BEAT
+        else if (elapsed < TIME_SCATTER + TIME_GATHER + TIME_BEAT) {
+            phase = 'beat';
+            rotationY = 0; 
+            let beatTime = elapsed - (TIME_SCATTER + TIME_GATHER);
+            beatScale = 1 + 0.08 * Math.pow(Math.sin(beatTime * 3), 63); 
+
+            if (beatTime > 3) {
+                 if(document.getElementById('final-ui').style.opacity != 1) {
+                    document.getElementById('final-ui').classList.add('show-ui');
+                    document.getElementById('center-text').classList.add('scale-up');
+                    setTimeout(() => {
+                        document.getElementById('p-left').classList.add('slide-in');
+                        document.getElementById('p-right').classList.add('slide-in');
+                    }, 500);
+                }
+            }
+        }
+        // 4. EXPLODE (Chuyển tiếp)
+        else if (elapsed < TIME_SCATTER + TIME_GATHER + TIME_BEAT + TIME_EXPLODE) {
+            phase = 'explode';
+            // Ẩn UI tim đi để nhường chỗ cho ảnh
+            document.getElementById('final-ui').classList.add('fade-out');
+        }
+        // 5. SPHERE (Hiện ảnh)
+        else {
+            phase = 'sphere';
+            // Hiện text click
+            document.getElementById('click-hint').style.opacity = 1;
+        }
+
+        // --- VẼ HẠT (BACKGROUND) ---
+        particles.forEach(p => {
+            p.update(phase, rotationY, beatScale, timestamp);
+            p.draw(ctx);
+        });
+
+        // --- VẼ ẢNH (FOREGROUND) ---
+        if (phase === 'sphere') {
+            // Tốc độ xoay quả cầu
+            let sphereTime = elapsed - (TIME_SCATTER + TIME_GATHER + TIME_BEAT + TIME_EXPLODE);
+            let sphereRotation = sphereTime * 0.2; 
+
+            // Update vị trí
+            photos.forEach(p => p.update(sphereRotation));
+
+            // Sắp xếp theo zIndex để ảnh gần vẽ đè ảnh xa (Painter's Algorithm)
+            photos.sort((a, b) => b.zIndex - a.zIndex);
+
+            // Vẽ
+            photos.forEach(p => p.draw(ctx));
+        }
+
+        requestAnimationFrame(loop);
+    }
+
+    function startShow() {
+        document.getElementById('gift-box').classList.add('hide-box');
+        init();
+        requestAnimationFrame(loop);
+    }
+</script>
+</body>
+</html>

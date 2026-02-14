@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Valentine 14/02</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CẤU TRÚC CƠ BẢN --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: radial-gradient(circle at center, #5d1a23 0%, #000000 100%);
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw; overflow: hidden;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .phone-container {
+            position: relative; width: 435px; height: 880px;
+            flex-shrink: 0; transform-origin: center center;
+            opacity: 0; transition: opacity 0.3s ease;
+            -webkit-box-reflect: below 0px linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.2));
+            transform: translateZ(0);
+        }
+
+        .iphone-frame {
+            position: relative; width: 100%; height: 100%;
+            background-color: #000; border-radius: 55px;
+            box-shadow: 0 0 0 2px #3a3a3a, 0 0 0 8px #1a1a1a, 0 0 0 10px #000, 0 30px 60px rgba(0,0,0,0.6);
+            overflow: hidden; color: white;
+            transform: translate3d(0,0,0);
+        }
+
+        .wallpaper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?q=80&w=2532&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            z-index: 0; transform: scale(1.05); will-change: transform;
+        }
+
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%, rgba(0,0,0,0.4) 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        /* --- DYNAMIC ISLAND (ĐÃ SỬA Z-INDEX LÊN 999 ĐỂ LUÔN NỔI) --- */
+        .dynamic-island-container {
+            position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+            z-index: 999; /* Luôn nằm trên cùng */
+            width: 126px; height: 37px; pointer-events: none;
+        }
+        .dynamic-island {
+            width: 100%; height: 100%; background-color: black;
+            border-radius: 50px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 10px; box-shadow: inset 0 0 2px rgba(255,255,255,0.1);
+        }
+        .di-camera {
+            width: 18px; height: 18px; margin-left: 8px; position: relative;
+            background: #0f0f0f; border-radius: 50%; box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+        }
+        .di-camera::after {
+            content: ''; position: absolute; top: 40%; left: 40%; width: 4px; height: 4px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
+        }
+
+        /* --- HOME INDICATOR (ĐÃ SỬA Z-INDEX LÊN 999) --- */
+        .home-indicator { 
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); 
+            width: 130px; height: 5px; background-color: white; border-radius: 10px; 
+            z-index: 999; /* Luôn nằm trên cùng */
+        }
+
+        /* --- MÀN HÌNH CHÍNH --- */
+        .screen-content {
+            position: relative; z-index: 10; height: 100%;
+            display: flex; flex-direction: column; align-items: center; padding-top: 80px;
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.5s ease;
+        }
+
+        .date { font-size: 20px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 5px; }
+        .time-wrapper { display: flex; align-items: center; justify-content: center; margin-top: -10px; font-family: 'Open Sans', sans-serif; }
+        .time-number { font-size: 98px; font-weight: 600; letter-spacing: -4px; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); font-variant-numeric: tabular-nums; }
+        .time-colon { font-size: 86px; font-weight: 500; margin: 0 2px; position: relative; top: -6px; opacity: 0.9; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        .notification-area { margin-top: auto; margin-bottom: 20px; width: 91%; display: flex; flex-direction: column; gap: 10px; z-index: 20; }
+        .notification-card {
+            background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px; padding: 12px 15px; display: flex; align-items: flex-start; gap: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.15);
+            transition: transform 0.2s ease; cursor: pointer;
+        }
+        .notification-card:active { transform: scale(0.96); background: rgba(255,255,255,0.35); }
+          .notification-card:hover {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.35);
+        }
+        .app-icon { margin-top: 4px; width: 38px; height: 38px; border-radius: 8px; overflow: hidden; background: white; display: flex; justify-content: center; align-items: center; }
+        .messenger-logo { width:80%; height: 80%; object-fit: cover; }
+        .noti-content { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-top: 2px;}
+        .noti-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+        .noti-title { font-weight: 600; font-size: 15px; }
+        .noti-time { font-size: 13px; color: rgba(255,255,255,0.6); }
+        .noti-message { font-size: 15px; line-height: 1.3; font-weight: 400;}
+
+        .bottom-actions { width: 100%; display: flex; justify-content: space-between; padding: 0 46px; margin-bottom: 50px; z-index: 20; }
+        .action-btn { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.2s; cursor: pointer; }
+        .action-btn img { width: 28px; height: 28px; object-fit: contain; }
+        .action-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.9); }
+
+
+        /* --- MÀN HÌNH PASSCODE --- */
+        .passcode-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; 
+            background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; align-items: center; padding-top: 100px;
+            opacity: 0; pointer-events: none; transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease; will-change: transform;
+        }
+        .passcode-screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+        .passcode-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; margin-top: 60px; }
+        .passcode-hint { font-size: 14px; opacity: 0.7; margin-bottom: 25px; }
+        .passcode-dots { display: flex; gap: 15px; margin-bottom: 50px; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid white; background: transparent; transition: 0.2s; }
+        .dot.filled { background: white; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 25px; margin-bottom: 30px; }
+        .key-btn { width: 78px; height: 78px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: 400; transition: background 0.2s; cursor: pointer; }
+        .key-btn:active { background: rgba(255, 255, 255, 0.4); }
+        .cancel-btn { font-size: 16px; font-weight: 600; margin-top: 10px; cursor: pointer; padding: 10px; }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+        /* --- MÀN HÌNH TIN NHẮN --- */
+        .chat-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 150; 
+            display: flex; flex-direction: column;
+            background-image: url('anhdoi.png'); /* ẢNH NỀN */
+            background-size: cover; background-position: center;
+            opacity: 0; pointer-events: none; transform: scale(0.95);
+            transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        
+        .chat-screen.active { opacity: 1; pointer-events: all; transform: scale(1); }
+        
+        .chat-screen::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.35); pointer-events: none; z-index: 0;
+        }
+
+        .chat-header {
+            padding: 50px 15px 15px; display: flex; align-items: center; z-index: 10; color: white;
+            background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .back-btn { color: #f2386d; font-size: 24px; margin-right: 15px; cursor: pointer;}
+        .avatar-box { position: relative; margin-right: 12px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); object-fit: cover; }
+        .active-dot { width: 12px; height: 12px; background: #31a24c; border: 2px solid #000; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+        .user-info { flex: 1; }
+        .user-name { font-weight: 700; font-size: 17px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .user-status { font-size: 12px; opacity: 0.8; color: #ccc; }
+        .header-actions { display: flex; gap: 20px; color: #f2386d; font-size: 20px; }
+
+        .chat-area { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; z-index: 10; }
+
+        .bubble {
+            background: rgba(40, 40, 40, 0.65); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+            padding: 10px 16px; font-size: 16px; line-height: 1.4; color: white; max-width: 75%; align-self: flex-start;
+            transform-origin: left bottom; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+        }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .typing-indicator {
+            background-color: rgba(40, 40, 40, 0.65); backdrop-filter: blur(10px);
+            padding: 12px 15px; border-radius: 20px; align-self: flex-start; display: none;
+            gap: 4px; align-items: center; width: fit-content;
+            border-bottom-left-radius: 5px; border: 1px solid rgba(255,255,255,0.08);
+        }
+        .typing-dot { width: 6px; height: 6px; background: #bbb; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .gift-container { align-self: center; margin-top: 100px; display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0; transform: translateY(20px); transition: 0.5s; }
+        .gift-container.show { opacity: 1; transform: translateY(0); }
+        .gift-img {
+            width: 150px; height: auto;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)) drop-shadow(0 0 25px #ff4d6d);
+            transform-origin: top center; animation: swing 1.5s ease-in-out infinite alternate; 
+        }
+        @keyframes swing { from { transform: rotate(8deg); } to { transform: rotate(-8deg); } }
+
+        .chat-footer {
+            padding: 10px 15px 30px; display: flex; align-items: center; gap: 15px; z-index: 10;
+            background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .chat-footer i { font-size: 24px; color: #f2386d; cursor: pointer; }
+        .input-box { flex: 1; height: 38px; background: rgba(30, 30, 30, 0.8); border-radius: 20px; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; border: 1px solid rgba(255,255,255,0.1); }
+        .placeholder { color: #888; font-size: 15px; }
+
+
+        /* --- MÀN HÌNH THƯ TÌNH --- */
+        .letter-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 200; /* Cao hơn chat */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.5s ease;
+            color: #5d1a23; padding: 30px; text-align: center;
+        }
+        .letter-screen.show { opacity: 1; pointer-events: all; }
+        .letter-paper {
+            background: white; padding: 25px;
+            width: 100%; max-height: 85%;
+            border-radius: 10px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            overflow-y: auto;
+            font-family: 'Great Vibes', cursive;
+            transform: scale(0.8); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .letter-screen.show .letter-paper { transform: scale(1); }
+        .letter-content { font-size: 28px; line-height: 1.6; color: #333; }
+        .letter-img { width: 100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover;}
+        .close-letter-btn { background: #ff4d6d; border: none; padding: 10px 20px; color: white; border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; font-family: sans-serif; font-size: 16px; }
+
+        /* --- CÁC HIỆU ỨNG KHÁC --- */
+        .heart {
+            position: absolute; color: #ff4d6d; font-size: 20px;
+            animation: float 6s linear forwards; 
+            z-index: 5; opacity: 0; pointer-events: none; bottom: -50px;
+            text-shadow: 0 0 5px rgba(255, 77, 109, 0.8);
+            will-change: transform;
+        }
+        @keyframes float { 0% { transform: translate3d(0, 0, 0) scale(0.6) rotate(0deg); opacity: 0; } 10% { opacity: 0.9; } 100% { transform: translate3d(0, -900px, 0) scale(1.3) rotate(20deg); opacity: 0; } }
+
+        .couple-container { position: absolute; top: 50px; width: 100%; height: 200px; display: flex; justify-content: center; align-items: center; z-index: 60; pointer-events: none; }
+        .char-img { position: absolute; width: 110px; height: auto; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
+        .char-girl { left: 30px; } .char-boy { right: 30px; }
+        .couple-img { position: absolute; width: 220px; height: auto; opacity: 0; transform: scale(0.8); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 5px 15px rgba(255, 77, 109, 0.4)); top: 20px; }
+        .pass-text-container { margin-top: 90px; text-align: center; transition: opacity 0.4s ease, transform 0.4s ease; }
+        .pass-text-container.hidden { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+
+        .confetti { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; z-index: 300; pointer-events: none; opacity: 0; }
+        @keyframes confetti-shoot { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(720deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container" id="phoneContainer">
+        <div class="iphone-frame">
+            <div class="wallpaper"></div>
+            <div class="overlay"></div>
+            
+            <div class="dynamic-island-container">
+                <div class="dynamic-island">
+                    <div class="di-sensor"></div>
+                    <div class="di-camera"></div>
+                </div>
+            </div>
+
+            <div class="screen-content" id="mainScreen">
+                <div class="date" id="date-display">...</div>
+                
+                <div class="time-wrapper">
+                    <span class="time-number" id="time-hour">--</span>
+                    <span class="time-colon">:</span>
+                    <span class="time-number" id="time-minute">--</span>
+                </div>
+                
+                <div id="hearts-container"></div>
+
+                <div class="notification-area">
+                    <div class="notification-card" onclick="showPasscodeScreen()">
+                        <div class="app-icon">
+                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Facebook_Messenger_logo_2025.svg/1280px-Facebook_Messenger_logo_2025.svg.png" class="messenger-logo" alt="Messenger">
+                        </div>
+                        <div class="noti-content">
+                            <div class="noti-header">
+                                <span class="noti-title">Anh Thiện ❤️</span>
+                                <span class="noti-time">bây giờ</span>
+                            </div>
+                            <div class="noti-message">Nhắn cho em một điều bí mật...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-actions">
+                    <div class="action-btn">
+                        <img src="https://img.icons8.com/?size=100&id=59787&format=png&color=ffffff" alt="Flashlight">
+                    </div>
+                    <div class="action-btn">
+                        <img src="https://img.icons8.com/ios-glyphs/60/ffffff/camera.png" alt="Camera">
+                    </div>
+                </div>
+            </div>
+
+            <div class="passcode-screen" id="passcodeScreen">
+                <div class="couple-container" id="coupleContainer">
+                    <img src="px2.png" class="char-img char-girl" id="charGirl">
+                    <img src="px3.png" class="char-img char-boy" id="charBoy">
+                    <img src="px1.png" class="couple-img" id="coupleStanding">
+                    <img src="px4.png" class="couple-img" id="coupleKissing">
+                </div>
+
+                <div class="pass-text-container" id="passTextContainer">
+                    <div class="passcode-title">Nhập mật mã tình yêu</div>
+                    <div class="passcode-hint">Gợi ý: Ngày valentine! (1402)</div>
+                </div>
+
+                <div class="passcode-dots" id="dotsContainer">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+
+                <div class="keypad">
+                    <div class="key-btn" onclick="addNumber(1)">1</div>
+                    <div class="key-btn" onclick="addNumber(2)">2</div>
+                    <div class="key-btn" onclick="addNumber(3)">3</div>
+                    <div class="key-btn" onclick="addNumber(4)">4</div>
+                    <div class="key-btn" onclick="addNumber(5)">5</div>
+                    <div class="key-btn" onclick="addNumber(6)">6</div>
+                    <div class="key-btn" onclick="addNumber(7)">7</div>
+                    <div class="key-btn" onclick="addNumber(8)">8</div>
+                    <div class="key-btn" onclick="addNumber(9)">9</div>
+                    <div class="key-btn" style="opacity:0; pointer-events:none"></div>
+                    <div class="key-btn" onclick="addNumber(0)">0</div>
+                    <div class="key-btn" style="opacity:0; pointer-events:none"></div>
+                </div>
+
+                <div class="cancel-btn" onclick="hidePasscodeScreen()">Hủy</div>
+            </div>
+
+            <div class="chat-screen" id="chatScreen">
+                <div class="chat-header">
+                    <i class="fas fa-chevron-left back-btn" onclick="closeChat()"></i>
+                    <div class="avatar-box">
+                        <img src="anh3.jpg" class="avatar">
+                        <div class="active-dot"></div>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Anh ❤️</div>
+                        <div class="user-status">Đang hoạt động</div>
+                    </div>
+                    <div class="header-actions">
+                       <i class="fa-solid fa-phone"></i>
+                        <i class="fas fa-video"></i>
+                    </div>
+                </div>
+
+                <div class="chat-area" id="chatArea">
+                    <div class="typing-indicator" id="typing">
+                        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                    </div>
+
+                    <div class="gift-container" id="giftBox" onclick="openLetter()">
+                        <img src="qua.png" class="gift-img" alt="Hộp quà">
+                        <div style="font-size: 13px; color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.8); margin-top: 10px;">Mở quà đi bé!</div>
+                    </div>
+                    <div style="height: 10px;"></div>
+                </div>
+
+                <div class="chat-footer">
+                    <i class="fas fa-plus-circle"></i>
+                    <i class="fas fa-camera"></i>
+                    <i class="fas fa-image"></i>
+                    <i class="fas fa-microphone"></i>
+                    <div class="input-box">
+                        <span class="placeholder">Aa</span>
+                        <i class="far fa-smile" style="color: #f2386d;"></i>
+                    </div>
+                    <i class="fas fa-heart" style="color: #ff4d6d;"></i>
+                </div>
+            </div>
+
+            <div class="letter-screen" id="letterScreen">
+                <div class="letter-paper">
+                    <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2670&auto=format&fit=crop" class="letter-img">
+                    <div class="letter-content">
+                        Gửi bé yêu,<br><br>
+                        Nếu em đọc được dòng này thì chúc mừng em đã mở khóa được trái tim anh!<br>
+                        Cảm ơn em đã đến bên anh. Yêu em nhiều lắm! ❤️<br><br>
+                        - Anh Thiện -
+                    </div>
+                    <button class="close-letter-btn" onclick="hideLetter()">Yêu anh ❤️</button>
+                </div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+
+    <audio id="loveSong" preload="auto">
+        <source src="My Love.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // --- CONFIG ---
+        const correctPasscode = "1402"; // MẬT MÃ ĐÚNG
+        let currentInput = "";
+
+        // --- SCALE RESPONSIVE ---
+        function resizePhone() {
+            const container = document.getElementById('phoneContainer');
+            const scale = Math.min((window.innerWidth - 20) / 435, (window.innerHeight - 20) / 900, 1);
+            container.style.transform = `scale(${scale})`;
+            container.style.opacity = '1';
+        }
+        window.addEventListener('load', resizePhone);
+        window.addEventListener('resize', resizePhone);
+
+        // --- TIME ---
+        function updateDateTime() {
+            const now = new Date();
+            let h = now.getHours(), m = now.getMinutes();
+            document.getElementById('time-hour').innerText = h < 10 ? '0'+h : h;
+            document.getElementById('time-minute').innerText = m < 10 ? '0'+m : m;
+            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+            document.getElementById('date-display').innerText = `${days[now.getDay()]}, ${now.getDate()} tháng ${now.getMonth()+1}`;
+        }
+        setInterval(updateDateTime, 1000); updateDateTime();
+
+        // --- TIM BAY ---
+        function createHeart() {
+            // Ngừng tim bay nếu đang ở màn hình chat hoặc thư
+            if (document.getElementById('passcodeScreen').classList.contains('active') || 
+                document.getElementById('chatScreen').classList.contains('active') ||
+                document.getElementById('letterScreen').classList.contains('show')) {
+                return; 
+            }
+
+            const container = document.querySelector('.iphone-frame');
+            if (document.querySelectorAll('.heart').length > 15) return;
+
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.style.left = (Math.random() * 80 + 10) + '%';
+            
+            const icons = ['❤️', '💖', '💕', '🥰', '😘'];
+            heart.innerText = icons[Math.floor(Math.random() * icons.length)];
+            heart.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 8000);
+        }
+        setInterval(createHeart, 800);
+
+        // --- LOGIC PASSCODE ---
+        function showPasscodeScreen() {
+            document.getElementById("loveSong").load();
+            document.getElementById('passcodeScreen').classList.add('active');
+            
+            const mainScreen = document.getElementById('mainScreen');
+            mainScreen.style.transform = "scale(0.85)";
+            mainScreen.style.opacity = "0.5";
+            mainScreen.style.filter = "blur(10px)";
+        }
+
+        function hidePasscodeScreen() {
+            document.getElementById('passcodeScreen').classList.remove('active');
+            
+            const mainScreen = document.getElementById('mainScreen');
+            mainScreen.style.transform = "scale(1)";
+            mainScreen.style.opacity = "1";
+            mainScreen.style.filter = "none";
+            
+            clearPasscode();
+        }
+
+        function addNumber(num) {
+            if (currentInput.length < 4) {
+                currentInput += num;
+                updateDots();
+                updateCoupleState();
+
+                if (currentInput.length === 4) {
+                    setTimeout(checkPasscode, 200);
+                }
+            }
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index < currentInput.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+        }
+
+        function clearPasscode() {
+            currentInput = "";
+            updateDots();
+            resetCoupleState();
+        }
+
+        function resetCoupleState() {
+            const charGirl = document.getElementById('charGirl');
+            const charBoy = document.getElementById('charBoy');
+            const coupleStanding = document.getElementById('coupleStanding');
+            const coupleKissing = document.getElementById('coupleKissing');
+            const passText = document.getElementById('passTextContainer');
+
+            charGirl.style.transform = `translateX(0)`; charGirl.style.opacity = '1';
+            charBoy.style.transform = `translateX(0)`; charBoy.style.opacity = '1';
+            coupleStanding.style.opacity = '0'; coupleKissing.style.opacity = '0';
+            passText.classList.remove('hidden');
+        }
+
+        function checkPasscode() {
+            if (currentInput === correctPasscode) {
+                unlockSuccess();
+            } else {
+                const dotsContainer = document.getElementById('dotsContainer');
+                dotsContainer.classList.remove('shake');
+                void dotsContainer.offsetWidth; // Trigger reflow
+                dotsContainer.classList.add('shake');
+                if (navigator.vibrate) navigator.vibrate(200);
+                setTimeout(() => { clearPasscode(); }, 500);
+            }
+        }
+
+        function updateCoupleState() {
+            const len = currentInput.length;
+            const charGirl = document.getElementById('charGirl');
+            const charBoy = document.getElementById('charBoy');
+            const coupleStanding = document.getElementById('coupleStanding');
+            const passText = document.getElementById('passTextContainer');
+
+            charGirl.style.opacity = '1'; charBoy.style.opacity = '1';
+
+            if (len < 3) {
+                passText.classList.remove('hidden'); 
+                const moveDist = len * 60;
+                charGirl.style.transform = `translateX(${moveDist}px)`;
+                charBoy.style.transform = `translateX(-${moveDist}px)`;
+                coupleStanding.style.opacity = '0'; 
+            } else {
+                passText.classList.add('hidden'); 
+                charGirl.style.opacity = '0'; charBoy.style.opacity = '0';
+                if (len >= 3) {
+                    coupleStanding.style.opacity = '1';
+                    coupleStanding.style.transform = 'scale(1.1)';
+                }
+            }
+        }
+
+        function createConfettiEffect() {
+            const container = document.getElementById('passcodeScreen');
+            const colors = ['#ff4d6d', '#ffb3c1', '#ffffff', '#ffd700'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const tx = (Math.random() - 0.5) * 400 + 'px';
+                const ty = (Math.random() - 1) * 400 + 'px';
+                
+                confetti.style.setProperty('--tx', tx);
+                confetti.style.setProperty('--ty', ty);
+                confetti.style.animation = `confetti-shoot ${1 + Math.random()}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
+                
+                container.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 2000);
+            }
+        }
+
+        // --- HÀM XỬ LÝ CHUYỂN CẢNH (QUAN TRỌNG) ---
+        function unlockSuccess() {
+            // Ẩn Text & Hiệu ứng hôn nhau
+            document.getElementById('passTextContainer').classList.add('hidden');
+            document.getElementById('coupleStanding').style.opacity = '0';
+            const kissImg = document.getElementById('coupleKissing');
+            kissImg.style.opacity = '1';
+            kissImg.style.transform = 'scale(1.3)';
+
+            var audio = document.getElementById("loveSong");
+            audio.play().catch(e => console.log("Cần tương tác"));
+            createConfettiEffect();
+
+            // SAU 2.5S -> CHUYỂN SANG MÀN HÌNH CHAT (THAY VÌ THƯ)
+            setTimeout(() => {
+                document.getElementById('passcodeScreen').classList.remove('active');
+                // Gọi hàm bắt đầu chat
+                startChat();
+            }, 2500);
+        }
+
+        // --- LOGIC CHAT MỚI ---
+        const messages = [
+            "Hello bé iu ❤️",
+            "...",
+            "................",
+            "..........................",
+            "Anh có một chút bất ngờ dành cho em nè 👇"
+        ];
+        
+        async function startChat() {
+            document.getElementById('chatScreen').classList.add('active');
+            
+            const chatArea = document.getElementById('chatArea');
+            const typingIndicator = document.getElementById('typing');
+            const giftBox = document.getElementById('giftBox');
+
+            // Đợi 1s cho animation chuyển cảnh xong
+            await new Promise(r => setTimeout(r, 1000));
+
+            for (let i = 0; i < messages.length; i++) {
+                // Hiển thị typing
+                typingIndicator.style.display = 'flex';
+                chatArea.scrollTop = chatArea.scrollHeight; // Auto scroll
+                
+                // Giả lập thời gian gõ (dựa vào độ dài tin nhắn)
+                const typingTime = Math.max(1000, messages[i].length * 50); 
+                await new Promise(r => setTimeout(r, typingTime));
+
+                // Ẩn typing, hiện tin nhắn
+                typingIndicator.style.display = 'none';
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.innerText = messages[i];
+                chatArea.insertBefore(bubble, typingIndicator);
+                
+                chatArea.scrollTop = chatArea.scrollHeight; // Auto scroll
+
+                // Nghỉ 1 chút trước khi nhắn tin tiếp
+                const readingTime = 1200; 
+                await new Promise(r => setTimeout(r, readingTime));
+            }
+
+            // Hiện hộp quà sau cùng
+            setTimeout(() => {
+                giftBox.classList.add('show');
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 500);
+        }
+
+        function closeChat() {
+             // Quay lại màn hình khóa (hoặc reset tùy ý)
+             location.reload(); 
+        }
+
+        // --- LOGIC THƯ TÌNH ---
+        function openLetter() {
+            document.getElementById('letterScreen').classList.add('show');
+        }
+
+        function hideLetter() {
+            document.getElementById('letterScreen').classList.remove('show');
+        }
+
+    </script>
+</body>
+</html>

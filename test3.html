@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gửi Em - Valentine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-dark: #d6336c;
+            --pink-glow: #ff4d6d;
+            --text-color: #5c3a45;
+        }
+
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            background-color: #1a0b14;
+            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px);
+            background-size: 550px 550px;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; font-family: 'Quicksand', sans-serif;
+        }
+
+        /* --- NGƯỜI ĐƯA THƯ --- */
+        #messenger-wrapper {
+            position: relative; width: 280px; height: 350px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10;
+        }
+
+        .person-img {
+            width: 100%; height: 100%; object-fit: contain;
+            /* Animation flyIn: bay vào trong 4s, sau đó đợi 5s rồi mới mờ đi */
+            animation: flyIn 4s ease-out forwards, personFadeOut 1s ease-in forwards 7s; 
+        }
+
+        .letter-img {
+            position: absolute; width: 250px; 
+            bottom: 130px; left: 50%;
+            transform: translateX(-50%) scale(0); /* Mặc định ẩn đi */
+            z-index: 2; cursor: pointer;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        /* Bay vào chậm hơn và dừng ở giữa */
+        @keyframes flyIn {
+            0% { transform: translate(-100vw, 20vh) scale(0.5); opacity: 0; }
+            100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        }
+
+        /* Biến mất */
+        @keyframes personFadeOut { 
+            to { opacity: 0; visibility: hidden; transform: scale(0.8); } 
+        }
+
+        /* Hiệu ứng bay bổng cho lá thư */
+        .letter-ready { 
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+            animation: float 2s ease-in-out infinite; 
+            filter: drop-shadow(0 0 10px #ffc0cb); 
+        }
+
+        @keyframes float { 
+            0%, 100% { transform: translate(-50%, 0); } 
+            50% { transform: translate(-50%, -15px) rotate(5deg); } 
+        }
+
+        /* --- LÁ THƯ POPUP --- */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            opacity: 0; visibility: hidden; transition: 0.5s; z-index: 20; backdrop-filter: blur(5px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        .paper-card {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 90%; max-width: 450px; height: 80vh; max-height: 600px;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe6eb 100%);
+            padding: 30px; border-radius: 15px; z-index: 30;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 20px rgba(255, 77, 109, 0.4);
+            display: flex; flex-direction: column; border: 2px solid #ffc0cb;
+        }
+        .paper-card.open { 
+            transform: translate(-50%, -50%) scale(1); 
+            box-shadow: 0 0 30px rgba(255, 77, 109, 0.6), 0 0 60px rgba(255, 77, 109, 0.4);
+        }
+
+        .corner-img-tl, .corner-img-br {
+            position: absolute; width: 100px; height: 100px; 
+            object-fit: cover; border-radius: 50%; 
+             z-index: 35;
+        }
+        .corner-img-tl { top: 2px; left: 2px; }
+        .corner-img-br { bottom: 2px; right: 2px; }
+
+        .card-body {
+            overflow-y: auto; flex: 1; margin: 35px 0; padding: 0 5px;
+            scrollbar-width: thin; scrollbar-color: #ffc0cb transparent;
+        }
+
+        .card-title {
+            font-family: 'Dancing Script', cursive; font-size: 1.8em;
+            color: var(--pink-dark); margin-top: 15px; text-align: center;
+        }
+        .card-content {
+            font-size: 1em; color: var(--text-color); line-height: 1.7;
+            font-weight: 600; text-align: center; white-space: pre-line;
+        }
+        .card-signature {
+            font-family: 'Dancing Script', cursive; font-size: 1.4em;
+            color: var(--pink-dark); text-align: right; opacity: 0; transition: 1s;
+        }
+
+        .close-btn {
+            position: absolute; top: 10px; right: 15px;
+            background: none; border: none; color: var(--pink-dark);
+            font-size: 1.8em; cursor: pointer; z-index: 40;
+        }
+
+        .heart-fall {
+            position: fixed; top: -10vh; color: #ff4d6d;
+            animation: fall linear forwards; z-index: 25;
+        }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="messenger-wrapper">
+        <img src="thu.png" class="person-img" id="person">
+        
+        <img src="thu1.png" class="letter-img" id="letter">
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="paper-card" id="paper-card">
+        <img src="trai.png" class="corner-img-tl" alt="Love 1">
+        <img src="gai.png" class="corner-img-br" alt="Love 2">
+        
+        <button class="close-btn" onclick="closeLetter()">&times;</button>
+        
+        <div class="card-body">
+            <h1 class="card-title" id="type-title"></h1>
+            <div class="card-content" id="type-content"></div>
+            <div class="card-signature" id="type-signature">
+                Mãi iu em ❤️<br>#Thienr_k
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const letter = document.getElementById('letter');
+        const card = document.getElementById('paper-card');
+        const overlay = document.getElementById('overlay');
+        const person = document.getElementById('person');
+        const titleEl = document.getElementById('type-title');
+        const contentEl = document.getElementById('type-content');
+        const signatureEl = document.getElementById('type-signature');
+
+        const titleText = "Chúc mừng ngày Valentine";
+        const messageText = "Anh có đôi điều nhắn nhủ tới em.\n\nHy vọng nhiều năm sau nữa, anh và em vẫn cùng nhau nắm tay đi qua tất cả thăng trầm của cuộc sống.\n\nCảm ơn vì chúng ta đã gặp được nhau.\n\nVì yêu mà đến, vì thương mà ở lại, vì hiểu nhau mà nhường nhịn nhau đến hiện tại.\n\nChúc anh và em sẽ luôn vui vẻ và hạnh phúc, mãi bên nhau nhé! \n❤️";
+
+        let typingTimer;
+
+        // LOGIC MỚI:
+        // 1. Person bay vào mất 4s.
+        // 2. Dừng lại 4s (tổng 8s). 
+        // 3. Sau 8s, hiện lá thư và ẩn person.
+        setTimeout(() => {
+            letter.classList.add('letter-ready');
+            letter.onclick = openLetter;
+            person.style.display = 'none'; // Ẩn hẳn person để không đè lên thư
+        }, 8000); 
+
+        function openLetter() {
+            letter.style.display = 'none';
+            overlay.classList.add('active');
+            card.classList.add('open');
+            
+            titleEl.innerHTML = "";
+            contentEl.innerHTML = "";
+            signatureEl.style.opacity = "0";
+
+            setTimeout(startTyping, 800);
+            createHearts();
+        }
+
+        function startTyping() {
+            let i = 0;
+            function typeTitle() {
+                if (i < titleText.length) {
+                    titleEl.innerHTML += titleText.charAt(i);
+                    i++;
+                    typingTimer = setTimeout(typeTitle, 80);
+                } else {
+                    typeContent();
+                }
+            }
+
+            let j = 0;
+            function typeContent() {
+                if (j < messageText.length) {
+                    let char = messageText.charAt(j);
+                    contentEl.innerHTML += char === "\n" ? "<br>" : char;
+                    j++;
+                    const body = document.querySelector('.card-body');
+                    body.scrollTop = body.scrollHeight;
+                    typingTimer = setTimeout(typeContent, 55);
+                } else {
+                    signatureEl.style.opacity = "1";
+                }
+            }
+            typeTitle();
+        }
+
+        function closeLetter() {
+            clearTimeout(typingTimer);
+            overlay.classList.remove('active');
+            card.classList.remove('open');
+            setTimeout(() => { 
+                letter.style.display = 'block'; 
+            }, 500);
+        }
+
+        function createHearts() {
+            for(let i=0; i<25; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart-fall');
+                    heart.innerHTML = '❤';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+                    heart.style.fontSize = Math.random() * 15 + 10 + 'px';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 5000);
+                }, i * 150);
+            }
+        }
+    </script>
+</body>
+</html>

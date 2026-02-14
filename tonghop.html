@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our Love Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================================
+           PHẦN 1: CSS CẤU TRÚC & RESPONSIVE (MOBILE)
+           ======================================================== */
+        body {
+            margin: 0; overflow: hidden;
+            background-color: #000;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; perspective: 1200px;
+            font-family: 'Cinzel', serif;
+        }
+
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+
+        /* --- HỘP QUÀ --- */
+        #gift-box {
+            position: absolute; z-index: 100; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center;
+            transition: all 0.5s ease-in-out;
+        }
+        .box-body {
+            width: 80px; height: 80px; background: linear-gradient(135deg, #ff4d6d, #a4133c);
+            position: relative; box-shadow: 0 0 50px rgba(255, 77, 109, 0.4);
+            animation: bounce 2s infinite ease-in-out; border: 2px solid #fff0f3;
+        }
+        .box-lid {
+            position: absolute; width: 94px; height: 25px;
+            background: #ff8fa3; top: -15px; left: -7px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 2px solid #fff0f3;
+        }
+        .ribbon { position: absolute; background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .r-v { width: 18px; height: 100%; left: 50%; transform: translateX(-50%); }
+        .r-h { width: 100%; height: 18px; top: 50%; transform: translateY(-50%); }
+        .guide-text {
+            color: #ffb3c1; margin-top: 20px; font-family: 'Dancing Script', cursive;
+            font-size: 22px; animation: breathe 2s infinite;
+        }
+
+        /* --- GIAO DIỆN TIM & NGÀY YÊU --- */
+        #center-ui {
+            position: absolute; z-index: 20; width: 100%; height: 100%; pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+            transform: scale(0.9);
+        }
+        
+        .couple-container {
+            display: flex; align-items: center; justify-content: center; gap: 40px;
+            width: 90%; max-width: 800px;
+        }
+
+        .center-content {
+            text-align: center; z-index: 20; display: flex; flex-direction: column; align-items: center;
+        }
+        .days {
+            font-size: 80px; color: #fff;
+            text-shadow: 0 0 30px rgba(255, 77, 109, 1); font-weight: 700; line-height: 1;
+            margin-bottom: 10px;
+        }
+        .days-label { 
+            font-family: 'Dancing Script'; font-size: 32px; color: #ffb7c5; 
+            text-shadow: 0 0 10px #ff4d6d; white-space: nowrap;
+        }
+
+        .person {
+            display: flex; flex-direction: column; align-items: center;
+            transition: transform 1s ease-out;
+        }
+        .avatar {
+            width: 130px; height: 130px; border-radius: 50%;
+            border: 4px solid #ff4d6d; object-fit: cover;
+            box-shadow: 0 0 40px rgba(255, 77, 109, 0.6);
+            background: #fff; margin-bottom: 15px;
+        }
+        .name { color: #fff; font-family: 'Dancing Script'; font-size: 28px; text-shadow: 0 0 10px #ff4d6d; }
+
+        .p-left { transform: translateX(-50px); opacity: 0; transition: all 1.5s ease; }
+        .p-right { transform: translateX(50px); opacity: 0; transition: all 1.5s ease; }
+        .show-ui .p-left, .show-ui .p-right { transform: translateX(0); opacity: 1; }
+
+
+        /* --- MOBILE OPTIMIZATION (QUAN TRỌNG) --- */
+        @media (max-width: 768px) {
+            .couple-container { gap: 15px; width: 100%; padding: 0 10px; }
+            .avatar { width: 85px; height: 85px; border-width: 2px; margin-bottom: 5px; }
+            .days { font-size: 45px; margin-bottom: 5px; }
+            .days-label { font-size: 20px; }
+            .name { font-size: 20px; }
+            
+            /* Thu nhỏ hộp quà trên mobile */
+            .box-body { width: 60px; height: 60px; }
+            .box-lid { width: 70px; height: 20px; top: -10px; left: -5px; }
+            .guide-text { font-size: 18px; }
+            
+            /* Chỉnh lại vị trí nút thư */
+            #mail-trigger { bottom: 20px; right: 20px; padding: 8px 15px; font-size: 16px; }
+
+            /* Chỉnh lại kích thước thư và ảnh người */
+            .messenger-inner { width: 90%; height: auto; aspect-ratio: 3/4; }
+            .letter-img { width: 180px; bottom: 100px; }
+            
+            /* Chỉnh popup thư */
+            .paper-card { width: 95%; height: 70vh; padding: 20px; }
+            .corner-img-tl, .corner-img-br { width: 60px; height: 60px; }
+        }
+
+        /* --- GALLERY 3D --- */
+        #gallery-container {
+            position: absolute; width: 100%; height: 100%; z-index: 10;
+            pointer-events: none; opacity: 0; transition: opacity 1s ease;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #drag-container, #spin-container { position: relative; display: flex; margin: auto; transform-style: preserve-3d; transform: rotateX(-10deg); }
+        #spin-container img {
+            position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            border-radius: 10px; box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+            border: 1px solid rgba(255, 182, 193, 0.5); object-fit: cover; cursor: pointer; transition: transform 1s;
+            -webkit-box-reflect: below 10px linear-gradient(transparent, transparent 50%, rgba(255, 255, 255, 0.2));
+        }
+
+        #zoom-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center;
+            z-index: 1000; cursor: zoom-out;
+        }
+        #zoom-container img { max-width: 95%; max-height: 80%; box-shadow: 0 0 30px #ff4d6d; border: 2px solid #fff; transform: scale(0.1); transition: transform 0.5s; }
+
+        /* --- TRẠNG THÁI --- */
+        .hide-box { transform: scale(0) rotate(180deg); opacity: 0; pointer-events: none; }
+        .show-ui { opacity: 1 !important; transform: scale(1) !important; }
+        .explode-ui { opacity: 0 !important; transform: scale(1.5) !important; filter: blur(20px); pointer-events: none; }
+        .active-gallery { pointer-events: auto !important; opacity: 1 !important; }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes breathe { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        /* --- NÚT GỬI THƯ --- */
+        #mail-trigger {
+            position: fixed; bottom: 30px; right: 30px; z-index: 200;
+            background: rgba(255, 255, 255, 0.1); border: 1px solid #ff4d6d;
+            color: #ffb3c1; padding: 10px 20px; border-radius: 30px;
+            cursor: pointer; font-family: 'Dancing Script'; font-size: 20px;
+            opacity: 0; pointer-events: none; transition: all 0.5s;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+        }
+        #mail-trigger:hover { background: #ff4d6d; color: #fff; transform: scale(1.1); }
+        .show-mail-btn { opacity: 1 !important; pointer-events: auto !important; animation: breathe 2s infinite; }
+
+        /* --- LÁ THƯ & ANIMATION --- */
+        #messenger-wrapper {
+            position: fixed; inset: 0; display: none; justify-content: center; align-items: center;
+            z-index: 300; font-family: 'Quicksand', sans-serif; pointer-events: none;
+        }
+        #messenger-wrapper.active-msg { display: flex; pointer-events: auto; }
+        .messenger-inner { position: relative; width: 280px; height: 350px; display: flex; justify-content: center; align-items: center; }
+        
+        .person-img { width: 100%; height: 100%; object-fit: contain; animation: flyIn 4s ease-out forwards, personFadeOut 1s ease-in forwards 7s; }
+        .letter-img { position: absolute; width: 250px; bottom: 130px; left: 50%; transform: translateX(-50%) scale(0); z-index: 2; cursor: pointer; opacity: 0; transition: all 0.5s ease; }
+        
+        @keyframes flyIn { 0% { transform: translate(-100vw, 20vh) scale(0.5); opacity: 0; } 100% { transform: translate(0, 0) scale(1); opacity: 1; } }
+        @keyframes personFadeOut { to { opacity: 0; visibility: hidden; transform: scale(0.8); } }
+        .letter-ready { opacity: 1; transform: translateX(-50%) scale(1); animation: float 2s ease-in-out infinite; filter: drop-shadow(0 0 10px #ffc0cb); }
+        @keyframes float { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -15px) rotate(5deg); } }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transition: 0.5s; z-index: 400; backdrop-filter: blur(5px); }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        .paper-card {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 90%; max-width: 450px; height: 80vh; max-height: 600px;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe6eb 100%);
+            padding: 30px; border-radius: 15px; z-index: 450;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 20px rgba(255, 77, 109, 0.4);
+            display: flex; flex-direction: column; border: 2px solid #ffc0cb;
+            font-family: 'Quicksand', sans-serif;
+        }
+        .paper-card.open { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 30px rgba(255, 77, 109, 0.6); }
+
+        .corner-img-tl, .corner-img-br { position: absolute; width: 100px; height: 100px; object-fit: cover; border-radius: 50%; z-index: 35; }
+        .corner-img-tl { top: 2px; left: 2px; }
+        .corner-img-br { bottom: 2px; right: 2px; }
+
+        .card-body { overflow-y: auto; flex: 1; margin: 35px 0; padding: 0 5px; scrollbar-width: thin; scrollbar-color: #ffc0cb transparent; }
+        .card-title { font-family: 'Dancing Script', cursive; font-size: 1.8em; color: var(--pink-dark); margin-top: 15px; text-align: center; }
+        .card-content { font-size: 1em; color: #5c3a45; line-height: 1.7; font-weight: 600; text-align: center; white-space: pre-line; }
+        .card-signature { font-family: 'Dancing Script', cursive; font-size: 1.4em; color: #d6336c; text-align: right; opacity: 0; transition: 1s; }
+        .close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #d6336c; font-size: 1.8em; cursor: pointer; z-index: 40; }
+        .heart-fall { position: fixed; top: -10vh; color: #ff4d6d; animation: fall linear forwards; z-index: 500; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="gift-box" onclick="startShow()">
+        <div class="box-body">
+            <div class="ribbon r-v"></div>
+            <div class="ribbon r-h"></div>
+            <div class="box-lid"></div>
+        </div>
+        <div class="guide-text">Chạm nhẹ để mở quà ❤️</div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="center-ui">
+        <div class="couple-container">
+            <div class="person p-left">
+                <img src="https://via.placeholder.com/150/87CEEB/FFFFFF?text=Sin" class="avatar" alt="Boy">
+                <div class="name">Sin</div>
+            </div>
+
+            <div class="center-content">
+                <div class="days" id="days-count">0</div>
+                <div class="days-label">Ngày yêu thương</div>
+            </div>
+
+            <div class="person p-right">
+                <img src="https://via.placeholder.com/150/FFB6C1/FFFFFF?text=Yi" class="avatar" alt="Girl">
+                <div class="name">Yi</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gallery-container">
+        <div id="drag-container">
+            <div id="spin-container">
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500" alt="1">
+                <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=500" alt="2">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500" alt="3">
+                <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=500" alt="4">
+                <img src="https://images.unsplash.com/photo-1522673607200-1645062cd958?w=500" alt="5">
+                <img src="https://images.unsplash.com/photo-1621600411688-4be93cd68504?w=500" alt="6">
+            </div>
+        </div>
+    </div>
+    <div id="zoom-container"><img id="zoomed-img" src=""></div>
+
+    <div id="mail-trigger" onclick="activateLetter()"><span>✉️</span> Gửi Em</div>
+
+    <div id="messenger-wrapper">
+        <div class="messenger-inner">
+            <img src="thu.png" class="person-img" id="person">
+            <img src="thu1.png" class="letter-img" id="letter">
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="paper-card" id="paper-card">
+        <img src="trai.png" class="corner-img-tl">
+        <img src="gai.png" class="corner-img-br">
+        <button class="close-btn" onclick="closeLetter()">&times;</button>
+        <div class="card-body">
+            <h1 class="card-title" id="type-title"></h1>
+            <div class="card-content" id="type-content"></div>
+            <div class="card-signature" id="type-signature">Mãi iu em ❤️<br>#Thienr_k</div>
+        </div>
+    </div>
+
+<script>
+    // ======================================================
+    // 1. CẤU HÌNH NGÀY YÊU (TỰ ĐỘNG TÍNH TOÁN)
+    // ======================================================
+    const START_DATE = "2021-05-20"; 
+    
+    function updateDays() {
+        const start = new Date(START_DATE);
+        const now = new Date();
+        const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+        document.getElementById('days-count').innerText = diff;
+    }
+    updateDays(); 
+
+    // ======================================================
+    // 2. LOGIC HẠT BỤI & GALLERY
+    // ======================================================
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    // THỜI GIAN CÁC GIAI ĐOẠN (Đã chỉnh sửa theo yêu cầu)
+    const T1_SCATTER = 4;
+    const T2_GATHER  = 7;
+    const T3_BEAT    = 15; // Tăng lên 15 giây để tim đứng im đập lâu hơn
+    const T4_EXPLODE = 20; // Nổ ra sau giây thứ 20
+    
+    const CFG = { pCount: 5000, color: '#ff4d6d', heartSize: 35 }; 
+    let particles = [];
+    let startTime = null;
+    let uiShown = false, uiHidden = false, galleryShown = false, mailBtnShown = false;
+
+    function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+    function getHeartPos(t) { return { x: 16*Math.pow(Math.sin(t),3), y: -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)) }; }
+
+    class Particle {
+        constructor() {
+            this.x = 0; this.y = 0; this.z = 0;
+            this.scatterX = (Math.random()-0.5)*width*3; this.scatterY = (Math.random()-0.5)*height*3; this.scatterZ = (Math.random()-0.5)*3000;
+            const t = Math.random()*Math.PI*2; const h = getHeartPos(t); const d = (Math.random()-0.5)*3; 
+            this.targetX = h.x*CFG.heartSize; this.targetY = h.y*CFG.heartSize; this.targetZ = d*CFG.heartSize;
+            this.starX = (Math.random()-0.5)*width*4; this.starY = (Math.random()-0.5)*height*4; this.starZ = (Math.random()-0.5)*4000;
+            this.size = Math.random()*2+0.5; this.alpha = 1;
+            this.smoothScatter = 0.01+Math.random()*0.02; this.smoothHeart = 0.04+Math.random()*0.02; this.explodeSpeed = 0.015+Math.random()*0.015;
+            this.blinkOffset = Math.random()*Math.PI*2;
+        }
+        update(phase, rotationY, beatScale, timestamp) {
+            if (phase === 'scatter') {
+                this.x += (this.scatterX - this.x)*this.smoothScatter; this.y += (this.scatterY - this.y)*this.smoothScatter; this.z += (this.scatterZ - this.z)*this.smoothScatter;
+            } else if (phase === 'gather') {
+                // Đang tụ lại, vẫn xoay
+                let tx = this.targetX*beatScale; let ty = this.targetY*beatScale; let tz = this.targetZ*beatScale;
+                let rx = tx*Math.cos(rotationY) - tz*Math.sin(rotationY); let rz = tx*Math.sin(rotationY) + tz*Math.cos(rotationY);
+                this.x += (rx - this.x)*this.smoothHeart; this.y += (ty - this.y)*this.smoothHeart; this.z += (rz - this.z)*this.smoothHeart;
+            } else if (phase === 'beat') {
+                // ĐÃ SỬA: Khi beat, ép rotationY = 0 để tim đứng im chính giữa
+                let tx = this.targetX*beatScale; let ty = this.targetY*beatScale; let tz = this.targetZ*beatScale;
+                // Không nhân với rotationY nữa để giữ nguyên góc nhìn
+                this.x += (tx - this.x)*this.smoothHeart; this.y += (ty - this.y)*this.smoothHeart; this.z += (tz - this.z)*this.smoothHeart;
+            } else {
+                this.x += (this.starX - this.x)*this.explodeSpeed; this.y += (this.starY - this.y)*this.explodeSpeed; this.z += (this.starZ - this.z)*this.explodeSpeed;
+                const blink = Math.sin(timestamp*0.002 + this.blinkOffset); this.alpha = 0.2 + 0.8*(blink*0.5 + 0.5);
+            }
+            const scale = 400 / (400 + this.z + 1000); 
+            this.screenX = width/2 + this.x*scale; this.screenY = height/2 + this.y*scale; this.screenScale = scale;
+        }
+        draw(ctx) {
+            if (this.screenScale <= 0) return;
+            ctx.globalAlpha = this.alpha; ctx.fillStyle = CFG.color;
+            ctx.beginPath(); ctx.arc(this.screenX, this.screenY, this.size*this.screenScale, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    function loop(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let elapsed = (timestamp - startTime) / 1000;
+        ctx.clearRect(0, 0, width, height);
+        let phase = 'scatter', rotationY = 0, beatScale = 1;
+
+        if (elapsed < T1_SCATTER) { phase = 'scatter'; } 
+        else if (elapsed < T2_GATHER) { 
+            phase = 'gather'; 
+            rotationY = (elapsed - T1_SCATTER); // Vẫn xoay khi đang tụ
+        } 
+        else if (elapsed < T3_BEAT) { 
+            phase = 'beat'; 
+            // HIỆN GIAO DIỆN TIM
+            if (!uiShown) { document.getElementById('center-ui').classList.add('show-ui'); uiShown = true; }
+            
+            // Logic đập tim
+            let beatTime = elapsed - T2_GATHER; 
+            beatScale = 1 + 0.08*Math.pow(Math.sin(beatTime*3), 63); 
+            
+            // RotationY ko được dùng ở đây để tim đứng im (xử lý trong class Particle)
+        } 
+        else if (elapsed < T4_EXPLODE) { 
+            phase = 'explode'; 
+            // ẨN GIAO DIỆN TIM
+            if (!uiHidden) { document.getElementById('center-ui').classList.remove('show-ui'); document.getElementById('center-ui').classList.add('explode-ui'); uiHidden = true; }
+        } else {
+            phase = 'drift'; 
+            if (!galleryShown) { initGallery(); galleryShown = true; }
+            if (!mailBtnShown && elapsed > T4_EXPLODE + 1) { document.getElementById('mail-trigger').classList.add('show-mail-btn'); mailBtnShown = true; }
+        }
+        particles.forEach(p => { p.update(phase, rotationY, beatScale, timestamp); p.draw(ctx); });
+        requestAnimationFrame(loop);
+    }
+    function startShow() {
+        document.getElementById('gift-box').classList.add('hide-box');
+        particles = []; for(let i=0; i<CFG.pCount; i++) particles.push(new Particle());
+        requestAnimationFrame(loop);
+    }
+
+    // GALLERY LOGIC (TỰ ĐỘNG CHỈNH KÍCH THƯỚC CHO MOBILE)
+    const ospin = document.getElementById('spin-container'); 
+    const odrag = document.getElementById('drag-container'); 
+    const aImg = ospin.getElementsByTagName('img');
+    let autoSpinTimer = null, tX = 0, tY = 10;
+    
+    // Điều chỉnh kích thước ảnh trong gallery
+    if(window.innerWidth < 768) {
+        ospin.style.width = "90px"; ospin.style.height = "130px"; // Mobile nhỏ hơn
+    } else {
+        ospin.style.width = "120px"; ospin.style.height = "170px";
+    }
+
+    function initGallery() {
+        document.getElementById('gallery-container').classList.add('active-gallery');
+        
+        // Điều chỉnh bán kính vòng xoay dựa trên màn hình
+        let radius = window.innerWidth < 768 ? 140 : 240; 
+
+        for (let i = 0; i < aImg.length; i++) {
+            aImg[i].style.transform = `rotateY(${i*(360/aImg.length)}deg) translateZ(${radius}px)`;
+            aImg[i].style.transitionDelay = (i||0)/4 + "s"; aImg[i].onclick = function() { showZoom(this.src); };
+        }
+        setTimeout(() => { playSpin(true); }, 1000);
+    }
+    function applyTransform(obj) { if(tY > 180) tY = 180; if(tY < 0) tY = 0; obj.style.transform = `rotateX(${-tY}deg) rotateY(${tX}deg)`; }
+    function playSpin(yes) { if (yes && !autoSpinTimer) autoSpinTimer = requestAnimationFrame(autoSpinLoop); if (!yes && autoSpinTimer) { cancelAnimationFrame(autoSpinTimer); autoSpinTimer = null; } }
+    function autoSpinLoop() { tX -= 0.1; applyTransform(odrag); autoSpinTimer = requestAnimationFrame(autoSpinLoop); }
+    document.onpointerdown = function(e) {
+        if (!galleryShown || document.getElementById('gallery-container').style.opacity === '0') return;
+        clearInterval(odrag.timer); playSpin(false); let sX = e.clientX, sY = e.clientY;
+        this.onpointermove = function(e) { let nX = e.clientX, nY = e.clientY; tX += (nX-sX)*0.1; tY += (nY-sY)*0.1; applyTransform(odrag); sX = nX; sY = nY; };
+        this.onpointerup = function() { this.onpointermove = this.onpointerup = null; odrag.timer = setInterval(function() { tX *= 0.95; tY *= 0.95; applyTransform(odrag); playSpin(false); }, 17); };
+        return false;
+    }
+    const zoomContainer = document.getElementById('zoom-container'), zoomedImg = document.getElementById('zoomed-img');
+    function showZoom(src) { playSpin(false); zoomedImg.src = src; zoomContainer.style.display = 'flex'; setTimeout(() => zoomedImg.style.transform = 'scale(1)', 50); }
+    zoomContainer.onclick = function() { zoomedImg.style.transform = 'scale(0.1)'; setTimeout(() => { this.style.display = 'none'; playSpin(true); }, 500); };
+
+    // ======================================================
+    // 3. LOGIC LÁ THƯ
+    // ======================================================
+    const letter = document.getElementById('letter');
+    const card = document.getElementById('paper-card');
+    const overlay = document.getElementById('overlay');
+    const person = document.getElementById('person');
+    const titleEl = document.getElementById('type-title');
+    const contentEl = document.getElementById('type-content');
+    const signatureEl = document.getElementById('type-signature');
+
+    const titleText = "Chúc mừng ngày Valentine";
+    const messageText = "Anh có đôi điều nhắn nhủ tới em.\n\nHy vọng nhiều năm sau nữa, anh và em vẫn cùng nhau nắm tay đi qua tất cả thăng trầm của cuộc sống.\n\nCảm ơn vì chúng ta đã gặp được nhau.\n\nVì yêu mà đến, vì thương mà ở lại, vì hiểu nhau mà nhường nhịn nhau đến hiện tại.\n\nChúc anh và em sẽ luôn vui vẻ và hạnh phúc, mãi bên nhau nhé! \n❤️";
+    let typingTimer;
+
+    function activateLetter() {
+        const gallery = document.getElementById('gallery-container');
+        gallery.classList.remove('active-gallery');
+        gallery.style.opacity = '0'; gallery.style.pointerEvents = 'none';
+        document.getElementById('mail-trigger').style.display = 'none';
+        const messenger = document.getElementById('messenger-wrapper');
+        messenger.classList.add('active-msg'); 
+        setTimeout(() => { letter.classList.add('letter-ready'); letter.onclick = openLetter; person.style.display = 'none'; }, 8000); 
+    }
+
+    function openLetter() {
+        letter.style.display = 'none'; overlay.classList.add('active'); card.classList.add('open');
+        titleEl.innerHTML = ""; contentEl.innerHTML = ""; signatureEl.style.opacity = "0";
+        setTimeout(startTyping, 800); createHearts();
+    }
+    function startTyping() {
+        let i = 0;
+        function typeTitle() {
+            if (i < titleText.length) { titleEl.innerHTML += titleText.charAt(i); i++; typingTimer = setTimeout(typeTitle, 80); } 
+            else { typeContent(); }
+        }
+        let j = 0;
+        function typeContent() {
+            if (j < messageText.length) { 
+                let char = messageText.charAt(j); contentEl.innerHTML += char === "\n" ? "<br>" : char; j++; 
+                const body = document.querySelector('.card-body'); body.scrollTop = body.scrollHeight; 
+                typingTimer = setTimeout(typeContent, 55); 
+            } else { signatureEl.style.opacity = "1"; }
+        }
+        typeTitle();
+    }
+    function closeLetter() {
+        clearTimeout(typingTimer); overlay.classList.remove('active'); card.classList.remove('open');
+        setTimeout(() => { letter.style.display = 'block'; }, 500);
+    }
+    function createHearts() {
+        for(let i=0; i<25; i++) {
+            setTimeout(() => {
+                const heart = document.createElement('div'); heart.classList.add('heart-fall'); heart.innerHTML = '❤';
+                heart.style.left = Math.random() * 100 + 'vw'; heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+                heart.style.fontSize = Math.random() * 15 + 10 + 'px';
+                document.body.appendChild(heart); setTimeout(() => heart.remove(), 5000);
+            }, i * 150);
+        }
+    }
+</script>
+</body>
+</html>
